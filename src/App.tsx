@@ -116,7 +116,7 @@ function App() {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const timer = window.setTimeout(() => setLoaded(true), reduceMotion ? 0 : 950);
+    const timer = window.setTimeout(() => setLoaded(true), reduceMotion ? 0 : 1550);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -153,6 +153,52 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!finePointer || reduceMotion) return;
+
+    const root = document.documentElement;
+    const handlePointerMove = (event: PointerEvent) => {
+      root.style.setProperty('--cursor-x', `${event.clientX}px`);
+      root.style.setProperty('--cursor-y', `${event.clientY}px`);
+
+      const interactive = (event.target as Element | null)?.closest<HTMLElement>('[data-magnetic]');
+      document.body.classList.toggle('cursor-active', Boolean(interactive));
+      document.querySelectorAll<HTMLElement>('[data-magnetic].is-magnetic').forEach((element) => {
+        if (element !== interactive) {
+          element.classList.remove('is-magnetic');
+          element.style.removeProperty('--magnetic-x');
+          element.style.removeProperty('--magnetic-y');
+        }
+      });
+
+      if (interactive) {
+        const bounds = interactive.getBoundingClientRect();
+        const x = (event.clientX - (bounds.left + bounds.width / 2)) * 0.12;
+        const y = (event.clientY - (bounds.top + bounds.height / 2)) * 0.12;
+        interactive.classList.add('is-magnetic');
+        interactive.style.setProperty('--magnetic-x', `${x.toFixed(2)}px`);
+        interactive.style.setProperty('--magnetic-y', `${y.toFixed(2)}px`);
+      }
+
+      const spotlight = (event.target as Element | null)?.closest<HTMLElement>('[data-spotlight]');
+      if (spotlight) {
+        const bounds = spotlight.getBoundingClientRect();
+        spotlight.style.setProperty('--spot-x', `${event.clientX - bounds.left}px`);
+        spotlight.style.setProperty('--spot-y', `${event.clientY - bounds.top}px`);
+      }
+    };
+
+    const handlePointerLeave = () => document.body.classList.remove('cursor-active');
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, []);
+
   const handleHeroPointer = (event: MouseEvent<HTMLElement>) => {
     if (!heroRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const bounds = heroRef.current.getBoundingClientRect();
@@ -176,10 +222,17 @@ function App() {
     <div className={loaded ? 'site is-loaded' : 'site'}>
       <a className="skip-link" href="#main">Skip to content</a>
       <div className="intro" aria-hidden="true">
-        <div className="intro-mark">HA<span>.</span></div>
-        <div className="intro-line"><i /></div>
-        <p>Engineering the complete picture</p>
+        <div className="intro-rail"><span>Portfolio / 2026</span><span>Colombo · Sri Lanka</span></div>
+        <div className="intro-sequence">
+          <span>Understand deeply.</span>
+          <span>Build deliberately.</span>
+          <span>Verify honestly.</span>
+        </div>
+        <div className="intro-signature"><div className="intro-mark">HA<span>.</span></div><p>Engineering the complete picture</p></div>
+        <div className="intro-progress"><i /><span>00</span><b>100</b></div>
       </div>
+      <div className="cursor-core" aria-hidden="true" />
+      <div className="cursor-aura" aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true" />
 
       <header className="site-header">
@@ -198,7 +251,7 @@ function App() {
             </a>
           ))}
         </nav>
-        <a className="header-github" href="https://github.com/Himath2002" target="_blank" rel="noreferrer">
+        <a className="header-github" data-magnetic href="https://github.com/Himath2002" target="_blank" rel="noreferrer">
           <GitHubIcon /><span>GitHub</span><ArrowIcon />
         </a>
         <button className="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
@@ -213,17 +266,17 @@ function App() {
           <div className="hero-orb orb-two" aria-hidden="true" />
           <div className="hero-copy">
             <div className="eyebrow hero-eyebrow"><span /> Software engineer · Colombo, Sri Lanka</div>
-            <h1>
-              I engineer<br />
-              <span>the complete</span><br />
-              picture<span className="accent-dot">.</span>
+            <h1 aria-label="I engineer the complete picture.">
+              <span className="hero-line"><i>I engineer</i></span>
+              <span className="hero-line outline"><i>the complete</i></span>
+              <span className="hero-line"><i>picture<span className="accent-dot">.</span></i></span>
             </h1>
             <p className="hero-lead">
               Products, systems, quality, and security—brought together with clear reasoning and a standard that holds from first idea to verified result.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#work">Explore the work <ArrowIcon /></a>
-              <a className="button button-ghost" href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> View source</a>
+              <a className="button button-primary" data-magnetic href="#work">Explore the work <ArrowIcon /></a>
+              <a className="button button-ghost" data-magnetic href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> View source</a>
             </div>
             <div className="achievement-strip" aria-label="Academic achievements">
               <div><strong>80.63</strong><span>Course Weighted Average</span></div>
@@ -244,6 +297,10 @@ function App() {
             <div className="floating-chip chip-build"><i /> Build</div>
             <div className="floating-chip chip-assure"><i /> Assure</div>
             <div className="floating-chip chip-secure"><i /> Secure</div>
+            <div className="engineering-console" aria-hidden="true">
+              <div><span>Engineering system</span><i>online</i></div>
+              <ol><li><b>01</b> Discover</li><li><b>02</b> Design</li><li><b>03</b> Build</li><li><b>04</b> Verify</li></ol>
+            </div>
             <div className="hero-index" aria-hidden="true">01 / 05</div>
           </div>
           <a className="scroll-cue" href="#work"><span>Scroll to explore</span><i /></a>
@@ -264,7 +321,7 @@ function App() {
             <p>Each case study shows a different problem shape—and the architecture, trade-offs, and verification used to solve it responsibly.</p>
           </div>
 
-          <article className="flagship" data-reveal>
+          <article className="flagship" data-reveal data-spotlight>
             <div className="flagship-topline"><span>Flagship platform</span><span>01 — EduGuard</span></div>
             <div className="flagship-copy">
               <div className="flagship-title">
@@ -277,7 +334,7 @@ function App() {
               <div className="flagship-points">
                 <span>React + TypeScript</span><span>FastAPI</span><span>PostgreSQL</span><span>Document analysis</span>
               </div>
-              <a className="text-link" href="https://github.com/Himath2002/eduguard-integrity-platform" target="_blank" rel="noreferrer">Explore the engineering case study <ArrowIcon /></a>
+              <a className="text-link" data-magnetic href="https://github.com/Himath2002/eduguard-integrity-platform" target="_blank" rel="noreferrer">Explore the engineering case study <ArrowIcon /></a>
             </div>
             <div className="flagship-visual">
               <div className="browser-shell">
@@ -300,8 +357,8 @@ function App() {
 
           <div className="project-grid">
             {featuredProjects.map((project, index) => (
-              <article className="project-card" data-reveal key={project.title}>
-                <a className="project-visual" href={project.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} repository`}>
+              <article className="project-card" data-reveal data-spotlight key={project.title}>
+                <a className="project-visual" data-magnetic href={project.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} repository`}>
                   <img src={project.image} alt={`${project.title} project overview`} loading="lazy" />
                   <span className="project-open">Open repository <ArrowIcon /></span>
                   <span className="project-count">{String(index + 2).padStart(2, '0')}</span>
@@ -336,7 +393,7 @@ function App() {
           </div>
           <div className="capability-grid">
             {capabilities.map((capability) => (
-              <article className="capability-card" data-reveal key={capability.title}>
+              <article className="capability-card" data-reveal data-spotlight key={capability.title}>
                 <div className="capability-card-top"><span>{capability.number}</span><i /></div>
                 <h3>{capability.title}<span>.</span></h3>
                 <strong>{capability.lead}</strong>
@@ -396,8 +453,8 @@ function App() {
             <h2>Have a difficult<br />problem worth <em>solving?</em></h2>
             <p>Explore the source, understand how I think, and reach me through GitHub.</p>
             <div className="contact-actions">
-              <a className="button button-primary" href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> Visit GitHub <ArrowIcon /></a>
-              <button className="button button-ghost" type="button" onClick={copyProfile}>{copied ? 'Profile link copied' : 'Copy profile link'}</button>
+              <a className="button button-primary" data-magnetic href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> Visit GitHub <ArrowIcon /></a>
+              <button className="button button-ghost" data-magnetic type="button" onClick={copyProfile}>{copied ? 'Profile link copied' : 'Copy profile link'}</button>
             </div>
           </div>
           <div className="contact-mark" aria-hidden="true">HA<span>.</span></div>

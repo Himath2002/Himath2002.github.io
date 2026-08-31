@@ -20,7 +20,7 @@ EduGuard leads the portfolio as the flagship platform. The remaining case studie
 ## Experience design
 
 - Original dark blue and black visual system with responsive typography
-- Brief entrance sequence, pointer depth, scroll reveals, marquee motion, and subtle orbital effects
+- Cinematic entrance sequence, pointer depth, magnetic controls, responsive hover lighting, scroll reveals, marquee motion, and orbital effects
 - Motion preferences respected through `prefers-reduced-motion`
 - Keyboard-accessible navigation, visible focus flow, semantic sections, and descriptive image text
 - Responsive layouts designed for large screens, tablets, and narrow mobile viewports
