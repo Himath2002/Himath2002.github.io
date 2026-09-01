@@ -276,7 +276,7 @@ function App() {
     heroRef.current.style.setProperty('--pointer-y', y.toFixed(3));
   };
 
-  const handlePortraitPointer = (event: MouseEvent<HTMLDivElement>) => {
+  const handlePortraitBrush = (event: MouseEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = Math.min(98, Math.max(2, ((event.clientX - bounds.left) / bounds.width) * 100));
     const y = Math.min(98, Math.max(2, ((event.clientY - bounds.top) / bounds.height) * 100));
@@ -358,14 +358,23 @@ function App() {
             <div
               className="portrait-frame"
               tabIndex={0}
-              onMouseMove={handlePortraitPointer}
-              aria-label="Interactive portrait. Move the pointer across the image to reveal a blue portrait and engineering qualities."
+              onMouseMove={handlePortraitBrush}
+              aria-label="Interactive portrait. Move the pointer across the image to reveal a watercolour portrait and engineering qualities."
             >
+              <svg className="portrait-effect-definitions" aria-hidden="true">
+                <defs>
+                  <filter id="watercolour-distortion" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.048" numOctaves="3" seed="17" result="watercolour-noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="watercolour-noise" scale="10" xChannelSelector="R" yChannelSelector="B" />
+                    <feGaussianBlur stdDeviation="0.12" />
+                  </filter>
+                </defs>
+              </svg>
               <div className="portrait-glow" aria-hidden="true" />
               <img className="portrait-base" src="/assets/himath-ahangama.jpg" alt="Himath Ahangama" />
-              <div className="portrait-lens" aria-hidden="true">
-                <img src="/assets/himath-ahangama.jpg" alt="" />
-                <div className="portrait-keywords">
+              <div className="portrait-paint" aria-hidden="true">
+                <img src="/assets/himath-ahangama-watercolour.webp" alt="" />
+                <div className="paint-keywords">
                   <span className="keyword-assure">Assure</span>
                   <span className="keyword-secure">Secure</span>
                   <span className="keyword-confidence">Confidence</span>

@@ -139,19 +139,19 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .achievement-strip span { color: #778198; font: 500 9px 'DM Mono', monospace; line-height: 1.4; letter-spacing: .06em; text-transform: uppercase; }
 
 .hero-visual { position: relative; z-index: 2; justify-self: end; width: min(570px, 43vw); margin-left: 34px; transform: translate(calc(var(--pointer-x) * -4px), calc(var(--pointer-y) * -4px)); transition: transform .15s linear; }
-.portrait-frame { --reveal-x: 50%; --reveal-y: 42%; --lens-radius: 0px; position: relative; z-index: 3; width: 74%; margin: 0 auto; overflow: hidden; border: 1px solid rgba(111,195,255,.3); border-radius: 48% 48% 30px 30px; background: linear-gradient(160deg, #101b35, #070914 68%); box-shadow: 0 36px 100px rgba(0,0,0,.48), inset 0 0 60px rgba(54,122,255,.08); outline-offset: 7px; transition: border-color .3s ease, box-shadow .3s ease; }
+.portrait-frame { --reveal-x: 50%; --reveal-y: 42%; position: relative; z-index: 3; width: 74%; margin: 0 auto; overflow: hidden; border: 1px solid rgba(111,195,255,.3); border-radius: 48% 48% 30px 30px; background: linear-gradient(160deg, #101b35, #070914 68%); box-shadow: 0 36px 100px rgba(0,0,0,.48), inset 0 0 60px rgba(54,122,255,.08); outline-offset: 7px; transition: border-color .3s ease, box-shadow .3s ease; }
 .portrait-frame::after { position: absolute; z-index: 4; inset: 0; content: ''; background: linear-gradient(to top, rgba(3,5,14,.34), transparent 24%); pointer-events: none; }
 .portrait-frame:hover, .portrait-frame:focus-visible { border-color: rgba(107,219,255,.68); box-shadow: 0 36px 100px rgba(0,0,0,.48), 0 0 0 1px rgba(75,204,255,.13), 0 0 55px rgba(34,138,255,.16), inset 0 0 60px rgba(54,122,255,.08); }
 .portrait-base { position: relative; z-index: 1; width: 100%; aspect-ratio: .8; object-fit: cover; object-position: 50% 44%; filter: saturate(.94) contrast(1.025); }
 .portrait-glow { position: absolute; z-index: 0; top: 6%; left: 8%; width: 84%; aspect-ratio: 1; border-radius: 50%; background: rgba(35,153,255,.18); filter: blur(40px); }
-.portrait-lens { position: absolute; z-index: 2; inset: 0; overflow: hidden; opacity: 0; clip-path: circle(var(--lens-radius) at var(--reveal-x) var(--reveal-y)); pointer-events: none; transition: opacity .18s ease; will-change: clip-path; }
-.portrait-frame:hover, .portrait-frame:focus-visible { --lens-radius: clamp(72px, 7.8vw, 104px); }
-.portrait-frame:hover .portrait-lens, .portrait-frame:focus-visible .portrait-lens { opacity: 1; }
-.portrait-lens > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 44%; filter: grayscale(1) brightness(1.02) contrast(1.2); }
-.portrait-lens::before { position: absolute; z-index: 1; inset: 0; content: ''; background: linear-gradient(135deg, rgba(151,241,255,.98), rgba(54,185,255,.9) 58%, rgba(93,115,255,.82)); mix-blend-mode: color; }
-.portrait-lens::after { position: absolute; z-index: 2; inset: 0; content: ''; background: radial-gradient(circle at var(--reveal-x) var(--reveal-y), rgba(225,252,255,.3), transparent 54%); mix-blend-mode: screen; }
-.portrait-keywords { position: absolute; z-index: 3; inset: 0; color: #ecfcff; font: 700 clamp(9px, .9vw, 13px) 'DM Mono', monospace; letter-spacing: .12em; text-shadow: 0 0 13px rgba(128,232,255,.85); text-transform: uppercase; }
-.portrait-keywords span { position: absolute; white-space: nowrap; }
+.portrait-effect-definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
+.portrait-paint { position: absolute; z-index: 2; inset: 0; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity .2s ease; filter: url(#watercolour-distortion); -webkit-mask-image: radial-gradient(ellipse clamp(110px, 10vw, 148px) clamp(62px, 6.5vw, 88px) at var(--reveal-x) var(--reveal-y), #000 0 44%, rgba(0,0,0,.92) 53%, rgba(0,0,0,.38) 65%, transparent 78%), radial-gradient(ellipse 74px 34px at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 34%, rgba(0,0,0,.55) 58%, transparent 77%), radial-gradient(ellipse 64px 29px at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 32%, rgba(0,0,0,.5) 58%, transparent 78%), radial-gradient(circle 24px at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.75), transparent 72%); mask-image: radial-gradient(ellipse clamp(110px, 10vw, 148px) clamp(62px, 6.5vw, 88px) at var(--reveal-x) var(--reveal-y), #000 0 44%, rgba(0,0,0,.92) 53%, rgba(0,0,0,.38) 65%, transparent 78%), radial-gradient(ellipse 74px 34px at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 34%, rgba(0,0,0,.55) 58%, transparent 77%), radial-gradient(ellipse 64px 29px at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 32%, rgba(0,0,0,.5) 58%, transparent 78%), radial-gradient(circle 24px at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.75), transparent 72%); will-change: mask-image, opacity; }
+.portrait-frame:hover .portrait-paint, .portrait-frame:focus-visible .portrait-paint { opacity: 1; }
+.portrait-paint > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 44%; filter: saturate(.76) contrast(1.02) brightness(1.07); }
+.portrait-paint::before { position: absolute; z-index: 1; inset: 0; content: ''; background: radial-gradient(ellipse at 33% 44%, rgba(205,234,238,.28), transparent 31%), radial-gradient(ellipse at 69% 53%, rgba(62,105,137,.24), transparent 37%), linear-gradient(104deg, rgba(193,226,232,.16), rgba(56,103,132,.1) 48%, rgba(231,242,245,.14)); mix-blend-mode: screen; opacity: .7; }
+.portrait-paint::after { position: absolute; z-index: 2; inset: 0; content: ''; background: linear-gradient(96deg, transparent 8%, rgba(222,246,248,.12) 43%, transparent 74%); mix-blend-mode: soft-light; }
+.paint-keywords { position: absolute; z-index: 3; inset: 0; color: rgba(240,250,250,.94); font: 700 clamp(9px, .9vw, 13px) 'DM Mono', monospace; letter-spacing: .12em; text-shadow: 0 1px 13px rgba(8,33,50,.78); text-transform: uppercase; }
+.paint-keywords span { position: absolute; white-space: nowrap; }
 .keyword-assure { top: 19%; left: 6%; }
 .keyword-secure { top: 29%; right: 5%; }
 .keyword-confidence { top: 42%; left: 3%; font-size: 1.12em; }
@@ -162,7 +162,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .keyword-resilience { bottom: 10%; left: 9%; }
 .keyword-deliver { right: 13%; bottom: 8%; }
 .keyword-systems { bottom: 31%; left: 5%; }
-@keyframes portrait-touch-lens { 0%, 12% { --reveal-x: 28%; --reveal-y: 27%; } 38% { --reveal-x: 70%; --reveal-y: 39%; } 65% { --reveal-x: 36%; --reveal-y: 63%; } 88%, 100% { --reveal-x: 68%; --reveal-y: 76%; } }
+@keyframes portrait-touch-paint { 0%, 12% { --reveal-x: 28%; --reveal-y: 27%; } 38% { --reveal-x: 70%; --reveal-y: 39%; } 65% { --reveal-x: 36%; --reveal-y: 63%; } 88%, 100% { --reveal-x: 68%; --reveal-y: 76%; } }
 .portrait-orbit { position: absolute; z-index: 1; border: 1px solid rgba(85,160,255,.19); border-radius: 50%; }
 .orbit-a { inset: 8% -1% 15%; transform: rotate(18deg); }
 .orbit-b { inset: 2% 7% 9%; transform: rotate(-24deg); }
@@ -474,6 +474,6 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .cursor-core, .cursor-aura { display: none; }
   .project-open { display: none; }
   .project-insight { display: none; }
-  .portrait-frame { --lens-radius: 72px; animation: portrait-touch-lens 8s cubic-bezier(.45,0,.55,1) infinite; }
-  .portrait-lens { opacity: 1; }
+  .portrait-frame { animation: portrait-touch-paint 9s cubic-bezier(.45,0,.55,1) infinite; }
+  .portrait-paint { opacity: 1; }
 }
