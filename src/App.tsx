@@ -228,7 +228,7 @@ function App() {
           <span>Build deliberately.</span>
           <span>Verify honestly.</span>
         </div>
-        <div className="intro-signature"><div className="intro-mark">HA<span>.</span></div><p>Engineering the complete picture</p></div>
+        <div className="intro-signature"><div className="intro-mark">HA<span>.</span></div><p>Clarity · evidence · delivery</p></div>
         <div className="intro-progress"><i /><span>00</span><b>100</b></div>
       </div>
       <div className="cursor-core" aria-hidden="true" />
@@ -266,13 +266,14 @@ function App() {
           <div className="hero-orb orb-two" aria-hidden="true" />
           <div className="hero-copy">
             <div className="eyebrow hero-eyebrow"><span /> Software engineer · Colombo, Sri Lanka</div>
-            <h1 aria-label="I engineer the complete picture.">
-              <span className="hero-line"><i>I engineer</i></span>
-              <span className="hero-line outline"><i>the complete</i></span>
-              <span className="hero-line"><i>picture<span className="accent-dot">.</span></i></span>
+            <h1 aria-label="Hard problems. Clear decisions. Software that delivers.">
+              <span className="hero-line"><i>Hard problems<span className="accent-dot">.</span></i></span>
+              <span className="hero-line"><i>Clear decisions<span className="accent-dot">.</span></i></span>
+              <span className="hero-line outline"><i>Software that</i></span>
+              <span className="hero-line"><i>delivers<span className="accent-dot">.</span></i></span>
             </h1>
             <p className="hero-lead">
-              Products, systems, quality, and security—brought together with clear reasoning and a standard that holds from first idea to verified result.
+              I bring product, systems, data, quality, and security together to turn demanding ideas into dependable results—from first architecture to verified delivery.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" data-magnetic href="#work">Explore the work <ArrowIcon /></a>
@@ -291,8 +292,6 @@ function App() {
             <div className="portrait-frame">
               <div className="portrait-glow" aria-hidden="true" />
               <img src="/assets/himath-ahangama.jpg" alt="Himath Ahangama" />
-              <div className="scan-line" aria-hidden="true" />
-              <div className="portrait-label"><span>Software engineering</span><strong>Full-spectrum practice</strong></div>
             </div>
             <div className="floating-chip chip-build"><i /> Build</div>
             <div className="floating-chip chip-assure"><i /> Assure</div>
