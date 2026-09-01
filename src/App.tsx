@@ -277,14 +277,11 @@ function App() {
   };
 
   const handlePortraitPointer = (event: MouseEvent<HTMLDivElement>) => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.min(90, Math.max(10, ((event.clientX - bounds.left) / bounds.width) * 100));
-    const y = Math.min(84, Math.max(16, ((event.clientY - bounds.top) / bounds.height) * 100));
-    const shift = ((x - 50) / 50) * 7;
+    const x = Math.min(98, Math.max(2, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const y = Math.min(98, Math.max(2, ((event.clientY - bounds.top) / bounds.height) * 100));
     event.currentTarget.style.setProperty('--reveal-x', `${x.toFixed(2)}%`);
     event.currentTarget.style.setProperty('--reveal-y', `${y.toFixed(2)}%`);
-    event.currentTarget.style.setProperty('--reveal-shift', `${shift.toFixed(2)}px`);
   };
 
   return (
@@ -362,20 +359,25 @@ function App() {
               className="portrait-frame"
               tabIndex={0}
               onMouseMove={handlePortraitPointer}
-              aria-label="Interactive portrait. Move the pointer across the image to reveal the system view."
+              aria-label="Interactive portrait. Move the pointer across the image to reveal a blue portrait and engineering qualities."
             >
               <div className="portrait-glow" aria-hidden="true" />
               <img className="portrait-base" src="/assets/himath-ahangama.jpg" alt="Himath Ahangama" />
-              <div className="portrait-signal" aria-hidden="true">
+              <div className="portrait-lens" aria-hidden="true">
                 <img src="/assets/himath-ahangama.jpg" alt="" />
-                <div className="portrait-signal-grid" />
-                <span className="portrait-signal-crosshair" />
-                <div className="portrait-signal-readout">
-                  <span>System view</span>
-                  <strong>Build / Assure / Secure</strong>
+                <div className="portrait-keywords">
+                  <span className="keyword-assure">Assure</span>
+                  <span className="keyword-secure">Secure</span>
+                  <span className="keyword-confidence">Confidence</span>
+                  <span className="keyword-quality">Quality</span>
+                  <span className="keyword-clarity">Clarity</span>
+                  <span className="keyword-verify">Verify</span>
+                  <span className="keyword-trust">Trust</span>
+                  <span className="keyword-resilience">Resilience</span>
+                  <span className="keyword-deliver">Deliver</span>
+                  <span className="keyword-systems">Systems</span>
                 </div>
               </div>
-              <div className="portrait-reveal-hint" aria-hidden="true"><i /> Move to reveal</div>
             </div>
             <div className="floating-chip chip-build"><i /> Build</div>
             <div className="floating-chip chip-assure"><i /> Assure</div>
