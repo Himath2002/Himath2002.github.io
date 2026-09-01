@@ -4,6 +4,7 @@ type Project = {
   title: string;
   eyebrow: string;
   description: string;
+  insight: string;
   image: string;
   href: string;
   tags: string[];
@@ -14,6 +15,7 @@ const featuredProjects: Project[] = [
     title: 'MealMetric',
     eyebrow: 'Android product',
     description: 'A privacy-minded meal journal with local-first Room storage, lifecycle-aware state, and an optional nutrition-search boundary.',
+    insight: 'Local-first data · explicit service boundary',
     image: '/assets/projects/mealmetric.svg',
     href: 'https://github.com/Himath2002/mealmetric-android',
     tags: ['Kotlin', 'Room', 'MVVM'],
@@ -22,6 +24,7 @@ const featuredProjects: Project[] = [
     title: 'Airspace Ops',
     eyebrow: 'Concurrent system',
     description: 'A JavaFX airport simulator where blocking queues, worker pools, and live aircraft movement make concurrency observable.',
+    insight: 'Blocking queues · worker pools · observable state',
     image: '/assets/projects/airspace.svg',
     href: 'https://github.com/Himath2002/airspace-ops-simulator',
     tags: ['Java', 'JavaFX', 'Concurrency'],
@@ -30,6 +33,7 @@ const featuredProjects: Project[] = [
     title: 'Modular Maze Engine',
     eyebrow: 'Extensible architecture',
     description: 'A desktop game engine combining a map DSL, independently compiled plugins, embedded scripts, and localization.',
+    insight: 'Plugin contracts · map DSL · embedded scripting',
     image: '/assets/projects/modular-maze.svg',
     href: 'https://github.com/Himath2002/modular-maze-engine',
     tags: ['Java', 'Plugins', 'Scripting'],
@@ -38,6 +42,7 @@ const featuredProjects: Project[] = [
     title: 'AeroRoute Algorithms',
     eyebrow: 'Algorithms laboratory',
     description: 'A route-planning lab built around handwritten data structures, bounded path discovery, and interchangeable sorting strategies.',
+    insight: 'Handwritten structures · interchangeable algorithms',
     image: '/assets/projects/aeroroute.svg',
     href: 'https://github.com/Himath2002/aeroroute-algorithms',
     tags: ['Java', 'DSA', 'Graphs'],
@@ -46,6 +51,7 @@ const featuredProjects: Project[] = [
     title: 'RelayLobby',
     eyebrow: 'Distributed desktop system',
     description: 'A WPF collaboration system comparing polling and duplex callbacks over a typed WCF service with synchronized shared state.',
+    insight: 'Polling vs callbacks · synchronized state',
     image: '/assets/projects/relay-lobby.svg',
     href: 'https://github.com/Himath2002/relay-lobby-wcf',
     tags: ['C#', 'WPF', 'WCF'],
@@ -54,6 +60,7 @@ const featuredProjects: Project[] = [
     title: 'PodiumDB',
     eyebrow: 'Database engineering',
     description: 'An integrity-first MySQL analytics system with normalized data, database-owned rules, deterministic fixtures, and a typed client.',
+    insight: 'Normalized schema · database-owned integrity',
     image: '/assets/projects/podiumdb.svg',
     href: 'https://github.com/Himath2002/podiumdb-mysql',
     tags: ['MySQL', 'Python', 'Analytics'],
@@ -107,11 +114,70 @@ function GitHubIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.82c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" /></svg>;
 }
 
+type AnimatedNumberProps = {
+  value: number;
+  decimals?: number;
+  suffix?: string;
+  delay?: number;
+  start?: boolean;
+};
+
+function AnimatedNumber({ value, decimals = 0, suffix = '', delay = 0, start = true }: AnimatedNumberProps) {
+  const numberRef = useRef<HTMLElement>(null);
+  const [displayValue, setDisplayValue] = useState('0');
+
+  useEffect(() => {
+    const element = numberRef.current;
+    if (!element) return;
+
+    const format = (current: number) => current.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!start) {
+      setDisplayValue('0');
+      return;
+    }
+    if (reduceMotion) {
+      setDisplayValue(format(value));
+      return;
+    }
+
+    let frame = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      const startedAt = performance.now();
+      const duration = 1450;
+      const animate = (now: number) => {
+        const progress = Math.min((now - startedAt) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setDisplayValue(format(value * eased));
+        if (progress < 1) frame = window.requestAnimationFrame(animate);
+      };
+      frame = window.requestAnimationFrame(animate);
+    }, { threshold: 0.55 });
+
+    const observerTimer = window.setTimeout(() => observer.observe(element), delay);
+    return () => {
+      window.clearTimeout(observerTimer);
+      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+    };
+  }, [decimals, delay, start, value]);
+
+  const finalValue = value.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return <strong ref={numberRef} aria-label={`${finalValue}${suffix}`}><span aria-hidden="true">{displayValue}{suffix}</span></strong>;
+}
+
 function App() {
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const [copied, setCopied] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -208,16 +274,6 @@ function App() {
     heroRef.current.style.setProperty('--pointer-y', y.toFixed(3));
   };
 
-  const copyProfile = async () => {
-    try {
-      await navigator.clipboard.writeText('https://github.com/Himath2002');
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      window.open('https://github.com/Himath2002', '_blank', 'noopener,noreferrer');
-    }
-  };
-
   return (
     <div className={loaded ? 'site is-loaded' : 'site'}>
       <a className="skip-link" href="#main">Skip to content</a>
@@ -280,8 +336,8 @@ function App() {
               <a className="button button-ghost" data-magnetic href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> View source</a>
             </div>
             <div className="achievement-strip" aria-label="Academic achievements">
-              <div><strong>80.63</strong><span>Course Weighted Average</span></div>
-              <div><strong>4×</strong><span>Consecutive Dean&apos;s List</span></div>
+              <div><AnimatedNumber value={80.63} decimals={2} delay={300} start={loaded} /><span>Course Weighted Average</span></div>
+              <div><AnimatedNumber value={4} suffix="×" delay={300} start={loaded} /><span>Consecutive Dean&apos;s List</span></div>
               <div><strong>Distinction</strong><span>Degree classification</span></div>
             </div>
           </div>
@@ -296,9 +352,10 @@ function App() {
             <div className="floating-chip chip-build"><i /> Build</div>
             <div className="floating-chip chip-assure"><i /> Assure</div>
             <div className="floating-chip chip-secure"><i /> Secure</div>
-            <div className="engineering-console" aria-hidden="true">
-              <div><span>Engineering system</span><i>online</i></div>
-              <ol><li><b>01</b> Discover</li><li><b>02</b> Design</li><li><b>03</b> Build</li><li><b>04</b> Verify</li></ol>
+            <div className="working-principle" aria-hidden="true">
+              <div><span>Working principle</span><i>evidence-led</i></div>
+              <strong>Understand → Build → Verify</strong>
+              <p>Clear decisions at every boundary.</p>
             </div>
             <div className="hero-index" aria-hidden="true">01 / 05</div>
           </div>
@@ -347,10 +404,10 @@ function App() {
               </div>
             </div>
             <div className="flagship-proof">
-              <div><strong>3</strong><span>Role-specific experiences</span></div>
-              <div><strong>375</strong><span>Automated checks</span></div>
-              <div><strong>0</strong><span>Open CodeQL findings</span></div>
-              <div><strong>Human</strong><span>Final judgement</span></div>
+              <div><AnimatedNumber value={3} /><span>Role-specific experiences</span></div>
+              <div><AnimatedNumber value={375} /><span>Automated quality checks</span></div>
+              <div><strong>Automated</strong><span>Evidence analysis pipeline</span></div>
+              <div><strong>Human</strong><span>Final review &amp; decision</span></div>
             </div>
           </article>
 
@@ -359,6 +416,7 @@ function App() {
               <article className="project-card" data-reveal data-spotlight key={project.title}>
                 <a className="project-visual" data-magnetic href={project.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} repository`}>
                   <img src={project.image} alt={`${project.title} project overview`} loading="lazy" />
+                  <span className="project-insight"><small>Engineering depth</small><strong>{project.insight}</strong></span>
                   <span className="project-open">Open repository <ArrowIcon /></span>
                   <span className="project-count">{String(index + 2).padStart(2, '0')}</span>
                 </a>
@@ -450,10 +508,24 @@ function App() {
           <div className="contact-copy" data-reveal>
             <span className="eyebrow">04 · Start a conversation</span>
             <h2>Have a difficult<br />problem worth <em>solving?</em></h2>
-            <p>Explore the source, understand how I think, and reach me through GitHub.</p>
+            <p>Explore the source, understand how I think, and choose the channel that best fits the conversation.</p>
+            <div className="contact-directory" aria-label="Contact information">
+              <a href="mailto:himath695@gmail.com">
+                <span>Email</span><strong>himath695@gmail.com</strong><ArrowIcon />
+              </a>
+              <a href="tel:+94765806130">
+                <span>Phone</span><strong>+94 76 580 6130</strong><ArrowIcon />
+              </a>
+              <a href="https://www.linkedin.com/in/himath-ahangama-a361a3402" target="_blank" rel="noreferrer">
+                <span>LinkedIn</span><strong>Himath Ahangama</strong><ArrowIcon />
+              </a>
+              <a href="https://wa.me/94765806130" target="_blank" rel="noreferrer">
+                <span>WhatsApp</span><strong>Start a direct chat</strong><ArrowIcon />
+              </a>
+            </div>
             <div className="contact-actions">
               <a className="button button-primary" data-magnetic href="https://github.com/Himath2002" target="_blank" rel="noreferrer"><GitHubIcon /> Visit GitHub <ArrowIcon /></a>
-              <button className="button button-ghost" data-magnetic type="button" onClick={copyProfile}>{copied ? 'Profile link copied' : 'Copy profile link'}</button>
+              <a className="button button-ghost" data-magnetic href="mailto:himath695@gmail.com">Send an email <ArrowIcon /></a>
             </div>
           </div>
           <div className="contact-mark" aria-hidden="true">HA<span>.</span></div>
@@ -463,7 +535,7 @@ function App() {
       <footer className="site-footer">
         <div><strong>Himath Ahangama</strong><span>Software Engineer</span></div>
         <p>Designed and engineered with intent.</p>
-        <div className="footer-links"><a href="#home">Back to top ↑</a><a href="https://github.com/Himath2002" target="_blank" rel="noreferrer">GitHub ↗</a></div>
+        <div className="footer-links"><a href="#home">Back to top ↑</a><a href="mailto:himath695@gmail.com">Email ↗</a><a href="https://www.linkedin.com/in/himath-ahangama-a361a3402" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Himath2002" target="_blank" rel="noreferrer">GitHub ↗</a></div>
       </footer>
     </div>
   );

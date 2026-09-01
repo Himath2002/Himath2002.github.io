@@ -20,7 +20,7 @@ EduGuard leads the portfolio as the flagship platform. The remaining case studie
 ## Experience design
 
 - Original dark blue and black visual system with responsive typography
-- Cinematic entrance sequence, pointer depth, magnetic controls, responsive hover lighting, scroll reveals, marquee motion, and orbital effects
+- Cinematic entrance sequence, accessible metric counters, pointer depth, magnetic controls, evidence-led hover layers, scroll reveals, marquee motion, and orbital effects
 - Motion preferences respected through `prefers-reduced-motion`
 - Keyboard-accessible navigation, visible focus flow, semantic sections, and descriptive image text
 - Responsive layouts designed for large screens, tablets, and narrow mobile viewports
@@ -77,6 +77,13 @@ Every push to `main` runs a clean install, production dependency audit, TypeScri
 The resulting site is served directly from:
 
 **[https://himath2002.github.io/](https://himath2002.github.io/)**
+
+## Contact
+
+- Email: [himath695@gmail.com](mailto:himath695@gmail.com)
+- Phone: [+94 76 580 6130](tel:+94765806130)
+- LinkedIn: [Himath Ahangama](https://www.linkedin.com/in/himath-ahangama-a361a3402)
+- WhatsApp: [Start a direct chat](https://wa.me/94765806130)
 
 ## Asset notice
 
