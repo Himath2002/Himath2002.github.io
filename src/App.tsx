@@ -379,14 +379,6 @@ function App() {
                 </div>
               </div>
             </div>
-            <div className="floating-chip chip-build"><i /> Build</div>
-            <div className="floating-chip chip-assure"><i /> Assure</div>
-            <div className="floating-chip chip-secure"><i /> Secure</div>
-            <div className="working-principle" aria-hidden="true">
-              <div><span>Working principle</span><i>evidence-led</i></div>
-              <strong>Understand → Build → Verify</strong>
-              <p>Clear decisions at every boundary.</p>
-            </div>
             <div className="hero-index" aria-hidden="true">01 / 05</div>
           </div>
           <a className="scroll-cue" href="#work"><span>Scroll to explore</span><i /></a>

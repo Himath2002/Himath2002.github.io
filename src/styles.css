@@ -169,20 +169,6 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .portrait-orbit::after { position: absolute; width: 7px; height: 7px; content: ''; border-radius: 50%; background: var(--blue); box-shadow: 0 0 16px var(--blue); }
 .orbit-a::after { top: 20%; right: 5%; }
 .orbit-b::after { bottom: 18%; left: 5%; background: var(--violet); }
-.floating-chip { position: absolute; z-index: 6; display: flex; align-items: center; gap: 8px; padding: 11px 14px; border: 1px solid rgba(146,180,234,.2); border-radius: 10px; color: #cbd6eb; background: rgba(8,12,27,.8); box-shadow: 0 14px 40px rgba(0,0,0,.25); font: 500 10px 'DM Mono', monospace; letter-spacing: .05em; text-transform: uppercase; backdrop-filter: blur(12px); }
-.floating-chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); }
-.chip-build { top: 21%; left: -1%; animation: float 5s ease-in-out infinite; }
-.chip-assure { top: 52%; right: -2%; animation: float 5.5s ease-in-out -1.2s infinite; }
-.chip-assure i { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
-.chip-secure { bottom: 17%; left: 2%; animation: float 6s ease-in-out -.5s infinite; }
-.chip-secure i { background: var(--violet); box-shadow: 0 0 10px var(--violet); }
-@keyframes float { 50% { transform: translateY(-9px); } }
-.working-principle { position: absolute; z-index: 5; top: 4%; right: -2%; width: 218px; padding: 14px; border: 1px solid rgba(118,174,235,.2); border-radius: 12px; background: linear-gradient(145deg, rgba(8,16,37,.92), rgba(5,9,22,.82)); box-shadow: 0 20px 55px rgba(0,0,0,.32); backdrop-filter: blur(14px); }
-.working-principle > div { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.08); color: #7e8ba5; font: 500 8px 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
-.working-principle > div i { display: flex; align-items: center; gap: 5px; color: var(--cyan); font-style: normal; }
-.working-principle > div i::before { width: 5px; height: 5px; content: ''; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: pulse 2s ease-in-out infinite; }
-.working-principle > strong { display: block; margin-top: 12px; color: #dce9f8; font-size: 11px; letter-spacing: -.01em; }
-.working-principle > p { margin: 6px 0 0; color: #7787a3; font: 500 8px 'DM Mono', monospace; }
 .hero-index { position: absolute; right: 0; bottom: 0; color: #566078; font: 500 10px 'DM Mono', monospace; letter-spacing: .12em; }
 .scroll-cue { position: absolute; z-index: 3; bottom: 28px; left: 50%; display: flex; align-items: center; gap: 12px; color: #667088; font: 500 9px 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; transform: translateX(-50%); }
 .scroll-cue i { position: relative; width: 34px; height: 1px; overflow: hidden; background: rgba(255,255,255,.18); }
@@ -433,11 +419,6 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .achievement-strip div + div { padding-left: 0; border-top: 1px solid var(--line); border-left: 0; }
   .hero-visual { width: 100%; margin-top: 64px; }
   .portrait-frame { width: 82%; border-radius: 48% 48% 24px 24px; }
-  .floating-chip { padding: 9px 10px; font-size: 8px; }
-  .chip-build { left: 0; }
-  .chip-assure { right: 0; }
-  .chip-secure { left: 1%; }
-  .working-principle { display: none; }
   .section, .contact-section { padding: 88px 18px; }
   .section-heading { margin-bottom: 54px; }
   .section-heading h2, .story-intro h2 { font-size: clamp(45px, 13vw, 68px); }
