@@ -20,7 +20,7 @@ EduGuard leads the portfolio as the flagship platform. The remaining case studie
 ## Experience design
 
 - Original dark blue and black visual system with responsive typography
-- Cinematic entrance sequence, accessible metric counters, pointer depth, magnetic controls, evidence-led hover layers, scroll reveals, marquee motion, and orbital effects
+- Readable cinematic entrance sequence, accessible metric counters, pointer depth, magnetic controls, dedicated professional-depth reveal panels, scroll reveals, marquee motion, and orbital effects
 - Motion preferences respected through `prefers-reduced-motion`
 - Keyboard-accessible navigation, visible focus flow, semantic sections, and descriptive image text
 - Responsive layouts designed for large screens, tablets, and narrow mobile viewports
@@ -32,7 +32,7 @@ The portfolio states only supplied or repository-backed facts:
 
 - 80.63 Course Weighted Average
 - Dean's List for four consecutive study periods
-- Software Engineering graduate from Curtin University with Distinction
+- Software Engineer with a Bachelor of Computing, Software Engineering Major, completed with Distinction at Curtin University
 - Educational foundation at Nalanda College, Colombo
 - Direct links to public source repositories
 

@@ -35,7 +35,27 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
 
       - name: Build portfolio
+        env:
+          VITE_TRANSCRIPT_URL: ${{ secrets.VITE_TRANSCRIPT_URL }}
         run: npm run check
+
+      - name: Stage academic eRecord
+        env:
+          ACADEMIC_ERECORD_PART_1: ${{ secrets.ACADEMIC_ERECORD_PART_1 }}
+          ACADEMIC_ERECORD_PART_2: ${{ secrets.ACADEMIC_ERECORD_PART_2 }}
+          ACADEMIC_ERECORD_PART_3: ${{ secrets.ACADEMIC_ERECORD_PART_3 }}
+          ACADEMIC_ERECORD_PART_4: ${{ secrets.ACADEMIC_ERECORD_PART_4 }}
+        run: |
+          record_path="dist/records/academic-erecord-e320834f.pdf"
+          install -d "$(dirname "$record_path")"
+          printf '%s%s%s%s' \
+            "$ACADEMIC_ERECORD_PART_1" \
+            "$ACADEMIC_ERECORD_PART_2" \
+            "$ACADEMIC_ERECORD_PART_3" \
+            "$ACADEMIC_ERECORD_PART_4" \
+            | base64 --decode > "$record_path"
+          test "$(sha256sum "$record_path" | cut -d ' ' -f 1)" = \
+            "e320834f31655c26a0d6b2341dded3f81a23de57065c0186398a007e0486a0bf"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

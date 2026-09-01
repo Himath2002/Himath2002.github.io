@@ -106,6 +106,29 @@ const capabilities = [
   },
 ];
 
+const professionalDepth = [
+  {
+    label: 'Systems thinking',
+    title: 'See the whole boundary.',
+    summary: 'Product, code, data, quality, and risk move together.',
+    detail: 'I trace how a decision travels across interfaces, services, storage, integrations, and operations before calling the solution complete.',
+  },
+  {
+    label: 'Engineering judgement',
+    title: 'Make trade-offs explicit.',
+    summary: 'Strong decisions explain what was gained, protected, and deferred.',
+    detail: 'I choose structure and tooling from the real constraints, then document the reasoning so another engineer can challenge or extend it.',
+  },
+  {
+    label: 'Delivery ownership',
+    title: 'Finish with evidence.',
+    summary: 'Working software is stronger when its confidence is inspectable.',
+    detail: 'I connect implementation with focused verification, failure-path thinking, reproducible setup, and clear handover instead of relying on presentation alone.',
+  },
+];
+
+const transcriptUrl = import.meta.env.VITE_TRANSCRIPT_URL?.trim();
+
 function ArrowIcon() {
   return <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 16 16 4M7 4h9v9" /></svg>;
 }
@@ -182,7 +205,7 @@ function App() {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const timer = window.setTimeout(() => setLoaded(true), reduceMotion ? 0 : 1550);
+    const timer = window.setTimeout(() => setLoaded(true), reduceMotion ? 0 : 7200);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -292,7 +315,7 @@ function App() {
       <div className="scroll-progress" aria-hidden="true" />
 
       <header className="site-header">
-        <a className="brand" href="#home" aria-label="Himath Ahangama — home">
+        <a className="brand" href="#home" aria-label="Himath Ahangama - home">
           <span>HA</span><i />
         </a>
         <nav className={menuOpen ? 'nav is-open' : 'nav'} aria-label="Primary navigation">
@@ -321,7 +344,7 @@ function App() {
           <div className="hero-orb orb-one" aria-hidden="true" />
           <div className="hero-orb orb-two" aria-hidden="true" />
           <div className="hero-copy">
-            <div className="eyebrow hero-eyebrow"><span /> Software engineering graduate · Colombo, Sri Lanka</div>
+            <div className="eyebrow hero-eyebrow"><span /> Software Engineer · Colombo, Sri Lanka</div>
             <h1 aria-label="Hard problems. Clear decisions. Software that delivers.">
               <span className="hero-line"><i>Hard problems<span className="accent-dot">.</span></i></span>
               <span className="hero-line"><i>Clear decisions<span className="accent-dot">.</span></i></span>
@@ -329,7 +352,7 @@ function App() {
               <span className="hero-line"><i>delivers<span className="accent-dot">.</span></i></span>
             </h1>
             <p className="hero-lead">
-              I bring product, systems, data, quality, and security together to turn demanding ideas into dependable results—from first architecture to verified delivery.
+              I bring product, systems, data, quality, and security together to turn demanding ideas into dependable results - from first architecture to verified delivery.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" data-magnetic href="#work">Explore the work <ArrowIcon /></a>
@@ -374,18 +397,18 @@ function App() {
           <div className="section-heading" data-reveal>
             <div><span className="section-number">01</span><span className="eyebrow">Selected work</span></div>
             <h2>Engineering decisions,<br /><em>made visible.</em></h2>
-            <p>Each case study shows a different problem shape—and the architecture, trade-offs, and verification used to solve it responsibly.</p>
+            <p>Each case study shows a different problem shape - and the architecture, trade-offs, and verification used to solve it responsibly.</p>
           </div>
 
           <article className="flagship" data-reveal data-spotlight>
-            <div className="flagship-topline"><span>Flagship platform</span><span>01 — EduGuard</span></div>
+            <div className="flagship-topline"><span>Flagship platform</span><span>01 - EduGuard</span></div>
             <div className="flagship-copy">
               <div className="flagship-title">
                 <span>Human-led academic integrity</span>
                 <h3>Edu<span>Guard</span></h3>
               </div>
               <p>
-                A multi-role academic-integrity platform that turns submission review, evidence analysis, marking, and feedback into one traceable workflow—while keeping judgement with people.
+                A multi-role academic-integrity platform that turns submission review, evidence analysis, marking, and feedback into one traceable workflow - while keeping judgement with people.
               </p>
               <div className="flagship-points">
                 <span>React + TypeScript</span><span>FastAPI</span><span>PostgreSQL</span><span>Document analysis</span>
@@ -463,6 +486,32 @@ function App() {
             <span>My operating principle</span>
             <p>Understand deeply <i /> design deliberately <i /> verify honestly <i /> communicate clearly</p>
           </div>
+
+          <div className="professional-depth" data-reveal>
+            <div className="professional-depth-heading">
+              <span className="eyebrow">Professional depth</span>
+              <h3>What sits beneath<br /><em>the finished work.</em></h3>
+              <p>Three qualities I bring to engineering decisions. Hover or focus on a panel to reveal what each one means in practice.</p>
+            </div>
+            <div className="depth-grid">
+              {professionalDepth.map((item, index) => (
+                <article className="depth-card" data-spotlight tabIndex={0} key={item.title}>
+                  <div className="depth-card-core">
+                    <div><span>{String(index + 1).padStart(2, '0')}</span><i /></div>
+                    <small>{item.label}</small>
+                    <h4>{item.title}</h4>
+                    <p>{item.summary}</p>
+                    <b>Hover or focus to reveal</b>
+                  </div>
+                  <div className="depth-reveal">
+                    <span>In practice</span>
+                    <p>{item.detail}</p>
+                    <i aria-hidden="true"><ArrowIcon /></i>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section id="story" className="section story-section">
@@ -481,7 +530,15 @@ function App() {
             <div className="timeline" data-reveal>
               <article>
                 <span className="timeline-date">University</span>
-                <div><h3>Software Engineering Graduate</h3><p>Curtin University · Bachelor&apos;s degree completed with Distinction</p></div>
+                <div>
+                  <h3>Bachelor of Computing</h3>
+                  <p>Software Engineering Major · Curtin University · Completed with Distinction</p>
+                  {transcriptUrl && (
+                    <a className="transcript-link" href={transcriptUrl} target="_blank" rel="noreferrer">
+                      Open academic eRecord <ArrowIcon />
+                    </a>
+                  )}
+                </div>
                 <strong>Distinction</strong>
               </article>
               <article>
