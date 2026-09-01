@@ -106,27 +106,6 @@ const capabilities = [
   },
 ];
 
-const professionalDepth = [
-  {
-    label: 'Systems thinking',
-    title: 'See the whole boundary.',
-    summary: 'Product, code, data, quality, and risk move together.',
-    detail: 'I trace how a decision travels across interfaces, services, storage, integrations, and operations before calling the solution complete.',
-  },
-  {
-    label: 'Engineering judgement',
-    title: 'Make trade-offs explicit.',
-    summary: 'Strong decisions explain what was gained, protected, and deferred.',
-    detail: 'I choose structure and tooling from the real constraints, then document the reasoning so another engineer can challenge or extend it.',
-  },
-  {
-    label: 'Delivery ownership',
-    title: 'Finish with evidence.',
-    summary: 'Working software is stronger when its confidence is inspectable.',
-    detail: 'I connect implementation with focused verification, failure-path thinking, reproducible setup, and clear handover instead of relying on presentation alone.',
-  },
-];
-
 const transcriptUrl = import.meta.env.VITE_TRANSCRIPT_URL?.trim();
 
 function ArrowIcon() {
@@ -297,6 +276,17 @@ function App() {
     heroRef.current.style.setProperty('--pointer-y', y.toFixed(3));
   };
 
+  const handlePortraitPointer = (event: MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.min(90, Math.max(10, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const y = Math.min(84, Math.max(16, ((event.clientY - bounds.top) / bounds.height) * 100));
+    const shift = ((x - 50) / 50) * 7;
+    event.currentTarget.style.setProperty('--reveal-x', `${x.toFixed(2)}%`);
+    event.currentTarget.style.setProperty('--reveal-y', `${y.toFixed(2)}%`);
+    event.currentTarget.style.setProperty('--reveal-shift', `${shift.toFixed(2)}px`);
+  };
+
   return (
     <div className={loaded ? 'site is-loaded' : 'site'}>
       <a className="skip-link" href="#main">Skip to content</a>
@@ -368,9 +358,24 @@ function App() {
           <div className="hero-visual" aria-label="Portrait of Himath Ahangama">
             <div className="portrait-orbit orbit-a" aria-hidden="true" />
             <div className="portrait-orbit orbit-b" aria-hidden="true" />
-            <div className="portrait-frame">
+            <div
+              className="portrait-frame"
+              tabIndex={0}
+              onMouseMove={handlePortraitPointer}
+              aria-label="Interactive portrait. Move the pointer across the image to reveal the system view."
+            >
               <div className="portrait-glow" aria-hidden="true" />
-              <img src="/assets/himath-ahangama.jpg" alt="Himath Ahangama" />
+              <img className="portrait-base" src="/assets/himath-ahangama.jpg" alt="Himath Ahangama" />
+              <div className="portrait-signal" aria-hidden="true">
+                <img src="/assets/himath-ahangama.jpg" alt="" />
+                <div className="portrait-signal-grid" />
+                <span className="portrait-signal-crosshair" />
+                <div className="portrait-signal-readout">
+                  <span>System view</span>
+                  <strong>Build / Assure / Secure</strong>
+                </div>
+              </div>
+              <div className="portrait-reveal-hint" aria-hidden="true"><i /> Move to reveal</div>
             </div>
             <div className="floating-chip chip-build"><i /> Build</div>
             <div className="floating-chip chip-assure"><i /> Assure</div>
@@ -487,31 +492,6 @@ function App() {
             <p>Understand deeply <i /> design deliberately <i /> verify honestly <i /> communicate clearly</p>
           </div>
 
-          <div className="professional-depth" data-reveal>
-            <div className="professional-depth-heading">
-              <span className="eyebrow">Professional depth</span>
-              <h3>What sits beneath<br /><em>the finished work.</em></h3>
-              <p>Three qualities I bring to engineering decisions. Hover or focus on a panel to reveal what each one means in practice.</p>
-            </div>
-            <div className="depth-grid">
-              {professionalDepth.map((item, index) => (
-                <article className="depth-card" data-spotlight tabIndex={0} key={item.title}>
-                  <div className="depth-card-core">
-                    <div><span>{String(index + 1).padStart(2, '0')}</span><i /></div>
-                    <small>{item.label}</small>
-                    <h4>{item.title}</h4>
-                    <p>{item.summary}</p>
-                    <b>Hover or focus to reveal</b>
-                  </div>
-                  <div className="depth-reveal">
-                    <span>In practice</span>
-                    <p>{item.detail}</p>
-                    <i aria-hidden="true"><ArrowIcon /></i>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
         </section>
 
         <section id="story" className="section story-section">
