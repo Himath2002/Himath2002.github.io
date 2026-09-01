@@ -265,7 +265,7 @@ function App() {
           <div className="hero-orb orb-one" aria-hidden="true" />
           <div className="hero-orb orb-two" aria-hidden="true" />
           <div className="hero-copy">
-            <div className="eyebrow hero-eyebrow"><span /> Software engineer · Colombo, Sri Lanka</div>
+            <div className="eyebrow hero-eyebrow"><span /> Software engineering graduate · Colombo, Sri Lanka</div>
             <h1 aria-label="Hard problems. Clear decisions. Software that delivers.">
               <span className="hero-line"><i>Hard problems<span className="accent-dot">.</span></i></span>
               <span className="hero-line"><i>Clear decisions<span className="accent-dot">.</span></i></span>
@@ -423,7 +423,7 @@ function App() {
             <div className="timeline" data-reveal>
               <article>
                 <span className="timeline-date">University</span>
-                <div><h3>Bachelor&apos;s in Software Engineering</h3><p>Curtin University · Degree completed with Distinction</p></div>
+                <div><h3>Software Engineering Graduate</h3><p>Curtin University · Bachelor&apos;s degree completed with Distinction</p></div>
                 <strong>Distinction</strong>
               </article>
               <article>

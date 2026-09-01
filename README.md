@@ -32,7 +32,7 @@ The portfolio states only supplied or repository-backed facts:
 
 - 80.63 Course Weighted Average
 - Dean's List for four consecutive study periods
-- Degree completed with Distinction at Curtin University
+- Software Engineering graduate from Curtin University with Distinction
 - Educational foundation at Nalanda College, Colombo
 - Direct links to public source repositories
 
