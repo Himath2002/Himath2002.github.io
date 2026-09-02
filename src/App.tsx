@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react';
 
 type Project = {
   title: string;
+  year: string;
   eyebrow: string;
   description: string;
   insight: string;
@@ -13,6 +14,7 @@ type Project = {
 const featuredProjects: Project[] = [
   {
     title: 'MealMetric',
+    year: '2024',
     eyebrow: 'Android product',
     description: 'A privacy-minded meal journal with local-first Room storage, lifecycle-aware state, and an optional nutrition-search boundary.',
     insight: 'Local-first data · explicit service boundary',
@@ -22,6 +24,7 @@ const featuredProjects: Project[] = [
   },
   {
     title: 'Airspace Ops',
+    year: '2025',
     eyebrow: 'Concurrent system',
     description: 'A JavaFX airport simulator where blocking queues, worker pools, and live aircraft movement make concurrency observable.',
     insight: 'Blocking queues · worker pools · observable state',
@@ -31,6 +34,7 @@ const featuredProjects: Project[] = [
   },
   {
     title: 'Modular Maze Engine',
+    year: '2025',
     eyebrow: 'Extensible architecture',
     description: 'A desktop game engine combining a map DSL, independently compiled plugins, embedded scripts, and localization.',
     insight: 'Plugin contracts · map DSL · embedded scripting',
@@ -40,6 +44,7 @@ const featuredProjects: Project[] = [
   },
   {
     title: 'AeroRoute Algorithms',
+    year: '2024',
     eyebrow: 'Algorithms laboratory',
     description: 'A route-planning lab built around handwritten data structures, bounded path discovery, and interchangeable sorting strategies.',
     insight: 'Handwritten structures · interchangeable algorithms',
@@ -49,6 +54,7 @@ const featuredProjects: Project[] = [
   },
   {
     title: 'RelayLobby',
+    year: '2025',
     eyebrow: 'Distributed desktop system',
     description: 'A WPF collaboration system comparing polling and duplex callbacks over a typed WCF service with synchronized shared state.',
     insight: 'Polling vs callbacks · synchronized state',
@@ -58,6 +64,7 @@ const featuredProjects: Project[] = [
   },
   {
     title: 'PodiumDB',
+    year: '2025',
     eyebrow: 'Database engineering',
     description: 'An integrity-first MySQL analytics system with normalized data, database-owned rules, deterministic fixtures, and a typed client.',
     insight: 'Normalized schema · database-owned integrity',
@@ -68,11 +75,11 @@ const featuredProjects: Project[] = [
 ];
 
 const archiveProjects = [
-  ['Urban Grid Planner', 'Graph-based planning and optimization', 'Java', 'https://github.com/Himath2002/urban-grid-planner'],
-  ['Railway Network Simulator', 'Event-driven transport simulation', 'Java', 'https://github.com/Himath2002/railway-network-simulator'],
-  ['Gridline Four', 'Android strategy game', 'Kotlin', 'https://github.com/Himath2002/gridline-four-android'],
-  ['Pursuit Rewind', 'Low-level terminal game', 'C', 'https://github.com/Himath2002/pursuit-rewind-c'],
-  ['Terminal Pursuit', 'Real-time console mechanics', 'C', 'https://github.com/Himath2002/terminal-pursuit-c'],
+  ['Urban Grid Planner', 'Graph-based planning and optimization', '2025', 'Java', 'https://github.com/Himath2002/urban-grid-planner'],
+  ['Railway Network Simulator', 'Event-driven transport simulation', '2025', 'Java', 'https://github.com/Himath2002/railway-network-simulator'],
+  ['Gridline Four', 'Android strategy game', '2024', 'Kotlin', 'https://github.com/Himath2002/gridline-four-android'],
+  ['Pursuit Rewind', 'Low-level terminal game', '2023', 'C', 'https://github.com/Himath2002/pursuit-rewind-c'],
+  ['Terminal Pursuit', 'Real-time console mechanics', '2023', 'C', 'https://github.com/Himath2002/terminal-pursuit-c'],
 ] as const;
 
 const capabilities = [
@@ -181,11 +188,47 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const heroRef = useRef<HTMLElement>(null);
+  const portraitFrameRef = useRef<HTMLDivElement>(null);
+  const portraitBrushTargetRef = useRef({ x: 50, y: 42 });
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const timer = window.setTimeout(() => setLoaded(true), reduceMotion ? 0 : 7200);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const frame = portraitFrameRef.current;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!frame || !finePointer || reduceMotion) return;
+
+    let x = 50;
+    let y = 42;
+    let velocityX = 0;
+    let velocityY = 0;
+    let animationFrame = 0;
+
+    const animateBrush = (time: number) => {
+      const target = portraitBrushTargetRef.current;
+      velocityX = (velocityX + (target.x - x) * 0.095) * 0.73;
+      velocityY = (velocityY + (target.y - y) * 0.095) * 0.73;
+      x += velocityX;
+      y += velocityY;
+
+      const speed = Math.min(2.2, Math.hypot(velocityX, velocityY) * 0.28);
+      const waterX = Math.sin(time * 0.0057 + y * 0.045) * (0.42 + speed);
+      const waterY = Math.cos(time * 0.0049 + x * 0.038) * (0.34 + speed * 0.72);
+      const revealX = Math.min(98, Math.max(2, x + waterX));
+      const revealY = Math.min(98, Math.max(2, y + waterY));
+
+      frame.style.setProperty('--reveal-x', `${revealX.toFixed(2)}%`);
+      frame.style.setProperty('--reveal-y', `${revealY.toFixed(2)}%`);
+      animationFrame = window.requestAnimationFrame(animateBrush);
+    };
+
+    animationFrame = window.requestAnimationFrame(animateBrush);
+    return () => window.cancelAnimationFrame(animationFrame);
   }, []);
 
   useEffect(() => {
@@ -280,8 +323,11 @@ function App() {
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = Math.min(98, Math.max(2, ((event.clientX - bounds.left) / bounds.width) * 100));
     const y = Math.min(98, Math.max(2, ((event.clientY - bounds.top) / bounds.height) * 100));
-    event.currentTarget.style.setProperty('--reveal-x', `${x.toFixed(2)}%`);
-    event.currentTarget.style.setProperty('--reveal-y', `${y.toFixed(2)}%`);
+    portraitBrushTargetRef.current = { x, y };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      event.currentTarget.style.setProperty('--reveal-x', `${x.toFixed(2)}%`);
+      event.currentTarget.style.setProperty('--reveal-y', `${y.toFixed(2)}%`);
+    }
   };
 
   return (
@@ -356,6 +402,7 @@ function App() {
             <div className="portrait-orbit orbit-a" aria-hidden="true" />
             <div className="portrait-orbit orbit-b" aria-hidden="true" />
             <div
+              ref={portraitFrameRef}
               className="portrait-frame"
               tabIndex={0}
               onMouseMove={handlePortraitBrush}
@@ -364,8 +411,12 @@ function App() {
               <svg className="portrait-effect-definitions" aria-hidden="true">
                 <defs>
                   <filter id="watercolour-distortion" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.048" numOctaves="3" seed="17" result="watercolour-noise" />
-                    <feDisplacementMap in="SourceGraphic" in2="watercolour-noise" scale="10" xChannelSelector="R" yChannelSelector="B" />
+                    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.048" numOctaves="3" seed="17" result="watercolour-noise">
+                      <animate attributeName="baseFrequency" dur="6.8s" values="0.018 0.048;0.024 0.039;0.016 0.054;0.021 0.044;0.018 0.048" repeatCount="indefinite" />
+                    </feTurbulence>
+                    <feDisplacementMap in="SourceGraphic" in2="watercolour-noise" scale="10" xChannelSelector="R" yChannelSelector="B">
+                      <animate attributeName="scale" dur="4.8s" values="9;15;11;17;9" repeatCount="indefinite" />
+                    </feDisplacementMap>
                     <feGaussianBlur stdDeviation="0.12" />
                   </filter>
                 </defs>
@@ -409,7 +460,7 @@ function App() {
           </div>
 
           <article className="flagship" data-reveal data-spotlight>
-            <div className="flagship-topline"><span>Flagship platform</span><span>01 - EduGuard</span></div>
+            <div className="flagship-topline"><span>Flagship platform</span><span>01 - EduGuard · 2026</span></div>
             <div className="flagship-copy">
               <div className="flagship-title">
                 <span>Human-led academic integrity</span>
@@ -450,6 +501,7 @@ function App() {
                   <span className="project-insight"><small>Engineering depth</small><strong>{project.insight}</strong></span>
                   <span className="project-open">Open repository <ArrowIcon /></span>
                   <span className="project-count">{String(index + 2).padStart(2, '0')}</span>
+                  <span className="project-year">{project.year}</span>
                 </a>
                 <div className="project-copy">
                   <div className="project-meta"><span>{project.eyebrow}</span><span>{String(index + 2).padStart(2, '0')} / 07</span></div>
@@ -464,9 +516,9 @@ function App() {
           <div className="archive" data-reveal>
             <div className="archive-heading"><span>More engineering work</span><p>Focused projects, each preserved as a clear technical case study.</p></div>
             <div className="archive-list">
-              {archiveProjects.map(([title, description, technology, href], index) => (
+              {archiveProjects.map(([title, description, year, technology, href], index) => (
                 <a href={href} target="_blank" rel="noreferrer" key={title}>
-                  <span>{String(index + 8).padStart(2, '0')}</span><strong>{title}</strong><p>{description}</p><em>{technology}</em><ArrowIcon />
+                  <span>{String(index + 8).padStart(2, '0')}</span><strong>{title}</strong><p>{description}</p><small className="archive-year">{year}</small><em>{technology}</em><ArrowIcon />
                 </a>
               ))}
             </div>
