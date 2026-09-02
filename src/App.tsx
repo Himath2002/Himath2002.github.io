@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react';
 
 type Project = {
   title: string;
@@ -283,6 +283,8 @@ function App() {
   const heroRef = useRef<HTMLElement>(null);
   const portraitFrameRef = useRef<HTMLDivElement>(null);
   const portraitBrushTargetRef = useRef({ x: 50, y: 42 });
+  const portraitBrushKickRef = useRef<(() => void) | null>(null);
+  const portraitTouchTimeoutRef = useRef<number | null>(null);
 
   const normalizedProjectQuery = normalizeSearchText(projectQuery);
   const projectSearchResults = useMemo(() => {
@@ -334,15 +336,23 @@ function App() {
 
   useEffect(() => {
     const frame = portraitFrameRef.current;
-    const finePointer = window.matchMedia('(pointer: fine)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!frame || !finePointer || reduceMotion) return;
+    if (!frame || reduceMotion) return;
 
     let x = 50;
     let y = 42;
+    let trailOneX = x;
+    let trailOneY = y;
+    let trailTwoX = x;
+    let trailTwoY = y;
+    let trailThreeX = x;
+    let trailThreeY = y;
     let velocityX = 0;
     let velocityY = 0;
+    let motion = 0;
     let animationFrame = 0;
+    let idleFrames = 0;
+    let running = false;
 
     const animateBrush = (time: number) => {
       const target = portraitBrushTargetRef.current;
@@ -351,19 +361,65 @@ function App() {
       x += velocityX;
       y += velocityY;
 
-      const speed = Math.min(2.2, Math.hypot(velocityX, velocityY) * 0.28);
-      const waterX = Math.sin(time * 0.0057 + y * 0.045) * (0.42 + speed);
-      const waterY = Math.cos(time * 0.0049 + x * 0.038) * (0.34 + speed * 0.72);
+      trailOneX += (x - trailOneX) * 0.2;
+      trailOneY += (y - trailOneY) * 0.2;
+      trailTwoX += (trailOneX - trailTwoX) * 0.135;
+      trailTwoY += (trailOneY - trailTwoY) * 0.135;
+      trailThreeX += (trailTwoX - trailThreeX) * 0.09;
+      trailThreeY += (trailTwoY - trailThreeY) * 0.09;
+
+      const speed = Math.hypot(velocityX, velocityY);
+      const motionTarget = Math.min(1, speed * 0.34);
+      motion += (motionTarget - motion) * (motionTarget > motion ? 0.28 : 0.11);
+      const directionX = speed > 0.035 ? velocityX / speed : 0;
+      const directionY = speed > 0.035 ? velocityY / speed : 0;
+      const waterX = Math.sin(time * 0.017 + y * 0.08) * motion * 1.65;
+      const waterY = Math.cos(time * 0.014 + x * 0.07) * motion * 1.4;
       const revealX = Math.min(98, Math.max(2, x + waterX));
       const revealY = Math.min(98, Math.max(2, y + waterY));
+      const wakeOffset = motion * 5.6;
+      const wakeAX = Math.min(98, Math.max(2, trailOneX - directionY * wakeOffset));
+      const wakeAY = Math.min(98, Math.max(2, trailOneY + directionX * wakeOffset));
+      const wakeBX = Math.min(98, Math.max(2, trailTwoX + directionY * wakeOffset * 0.74));
+      const wakeBY = Math.min(98, Math.max(2, trailTwoY - directionX * wakeOffset * 0.74));
 
       frame.style.setProperty('--reveal-x', `${revealX.toFixed(2)}%`);
       frame.style.setProperty('--reveal-y', `${revealY.toFixed(2)}%`);
+      frame.style.setProperty('--trail-one-x', `${trailOneX.toFixed(2)}%`);
+      frame.style.setProperty('--trail-one-y', `${trailOneY.toFixed(2)}%`);
+      frame.style.setProperty('--trail-two-x', `${trailTwoX.toFixed(2)}%`);
+      frame.style.setProperty('--trail-two-y', `${trailTwoY.toFixed(2)}%`);
+      frame.style.setProperty('--trail-three-x', `${trailThreeX.toFixed(2)}%`);
+      frame.style.setProperty('--trail-three-y', `${trailThreeY.toFixed(2)}%`);
+      frame.style.setProperty('--wake-a-x', `${wakeAX.toFixed(2)}%`);
+      frame.style.setProperty('--wake-a-y', `${wakeAY.toFixed(2)}%`);
+      frame.style.setProperty('--wake-b-x', `${wakeBX.toFixed(2)}%`);
+      frame.style.setProperty('--wake-b-y', `${wakeBY.toFixed(2)}%`);
+
+      const targetDistance = Math.hypot(target.x - x, target.y - y);
+      const wakeDistance = Math.hypot(x - trailThreeX, y - trailThreeY);
+      idleFrames = speed < 0.008 && targetDistance < 0.018 && wakeDistance < 0.025 && motion < 0.008 ? idleFrames + 1 : 0;
+      if (idleFrames >= 4) {
+        running = false;
+        animationFrame = 0;
+        return;
+      }
       animationFrame = window.requestAnimationFrame(animateBrush);
     };
 
-    animationFrame = window.requestAnimationFrame(animateBrush);
-    return () => window.cancelAnimationFrame(animationFrame);
+    const kickBrush = () => {
+      idleFrames = 0;
+      if (running) return;
+      running = true;
+      animationFrame = window.requestAnimationFrame(animateBrush);
+    };
+
+    portraitBrushKickRef.current = kickBrush;
+    kickBrush();
+    return () => {
+      portraitBrushKickRef.current = null;
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -454,15 +510,35 @@ function App() {
     heroRef.current.style.setProperty('--pointer-y', y.toFixed(3));
   };
 
-  const handlePortraitBrush = (event: MouseEvent<HTMLDivElement>) => {
+  useEffect(() => () => {
+    if (portraitTouchTimeoutRef.current !== null) window.clearTimeout(portraitTouchTimeoutRef.current);
+  }, []);
+
+  const handlePortraitBrush = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'mouse' && !event.currentTarget.classList.contains('is-painting')) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = Math.min(98, Math.max(2, ((event.clientX - bounds.left) / bounds.width) * 100));
     const y = Math.min(98, Math.max(2, ((event.clientY - bounds.top) / bounds.height) * 100));
     portraitBrushTargetRef.current = { x, y };
+    portraitBrushKickRef.current?.();
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       event.currentTarget.style.setProperty('--reveal-x', `${x.toFixed(2)}%`);
       event.currentTarget.style.setProperty('--reveal-y', `${y.toFixed(2)}%`);
     }
+  };
+
+  const handlePortraitTouchStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse') return;
+    if (portraitTouchTimeoutRef.current !== null) window.clearTimeout(portraitTouchTimeoutRef.current);
+    event.currentTarget.classList.add('is-painting');
+    handlePortraitBrush(event);
+  };
+
+  const handlePortraitTouchEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse') return;
+    const frame = event.currentTarget;
+    if (portraitTouchTimeoutRef.current !== null) window.clearTimeout(portraitTouchTimeoutRef.current);
+    portraitTouchTimeoutRef.current = window.setTimeout(() => frame.classList.remove('is-painting'), 720);
   };
 
   return (
@@ -541,8 +617,11 @@ function App() {
               ref={portraitFrameRef}
               className="portrait-frame"
               tabIndex={0}
-              onMouseMove={handlePortraitBrush}
-              aria-label="Interactive portrait. Move the pointer across the image to reveal a watercolour portrait and engineering qualities."
+              onPointerMove={handlePortraitBrush}
+              onPointerDown={handlePortraitTouchStart}
+              onPointerUp={handlePortraitTouchEnd}
+              onPointerCancel={handlePortraitTouchEnd}
+              aria-label="Interactive portrait. Move a pointer or touch and drag across the image to reveal a watercolour portrait and engineering qualities."
             >
               <svg className="portrait-effect-definitions" aria-hidden="true">
                 <defs>
@@ -575,6 +654,7 @@ function App() {
                 </div>
               </div>
             </div>
+            <div className="portrait-interaction-hint" aria-hidden="true"><span>Touch + drag to paint</span><i /><span>Keep scrolling to continue</span></div>
             <div className="hero-index" aria-hidden="true">01 / 05</div>
           </div>
           <a className="scroll-cue" href="#work"><span>Scroll to explore</span><i /></a>
