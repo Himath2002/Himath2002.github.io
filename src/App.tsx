@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 
 type Project = {
   title: string;
@@ -82,6 +82,94 @@ const archiveProjects = [
   ['Terminal Pursuit', 'Real-time console mechanics', '2023', 'C', 'https://github.com/Himath2002/terminal-pursuit-c'],
 ] as const;
 
+type SearchProject = {
+  title: string;
+  year: string;
+  category: string;
+  summary: string;
+  href: string;
+  tags: string[];
+  keywords: string[];
+};
+
+const projectSearchIndex: SearchProject[] = [
+  {
+    title: 'EduGuard',
+    year: '2026',
+    category: 'AI-powered integrity platform',
+    summary: 'Evidence analysis, traceable multi-role workflows, secure review, and human-led academic-integrity decisions.',
+    href: 'https://github.com/Himath2002/eduguard-integrity-platform',
+    tags: ['AI', 'React', 'FastAPI', 'PostgreSQL'],
+    keywords: ['artificial intelligence', 'document analysis', 'automation', 'academic integrity', 'typescript', 'python', 'web', 'api', 'security', 'workflow', 'quality assurance'],
+  },
+  ...featuredProjects.map((project) => ({
+    title: project.title,
+    year: project.year,
+    category: project.eyebrow,
+    summary: project.description,
+    href: project.href,
+    tags: project.tags,
+    keywords: project.title === 'MealMetric'
+      ? ['android', 'mobile', 'nutrition', 'privacy', 'local first', 'database', 'retrofit', 'api', 'material design']
+      : project.title === 'Airspace Ops'
+        ? ['java', 'javafx', 'desktop', 'concurrency', 'multithreading', 'blocking queues', 'worker pools', 'simulation', 'observable state']
+        : project.title === 'Modular Maze Engine'
+          ? ['java', 'desktop', 'game development', 'game engine', 'plugins', 'domain specific language', 'dsl', 'scripting', 'localization', 'extensibility']
+          : project.title === 'AeroRoute Algorithms'
+            ? ['java', 'algorithms', 'data structures', 'graphs', 'pathfinding', 'sorting', 'dsa', 'route planning']
+            : project.title === 'RelayLobby'
+              ? ['c sharp', 'dotnet', '.net', 'wpf', 'wcf', 'distributed systems', 'networking', 'polling', 'duplex callbacks', 'synchronization', 'desktop', 'service']
+              : ['mysql', 'sql', 'python', 'database', 'data', 'analytics', 'normalization', 'data integrity', 'typed client'],
+  })),
+  {
+    title: 'Urban Grid Planner', year: '2025', category: 'Planning algorithms', summary: 'Graph-based urban planning and optimization.', href: 'https://github.com/Himath2002/urban-grid-planner', tags: ['Java', 'Graphs', 'Optimization'], keywords: ['algorithms', 'data structures', 'route planning', 'urban systems'],
+  },
+  {
+    title: 'Railway Network Simulator', year: '2025', category: 'Transport simulation', summary: 'Event-driven railway-network and transport simulation.', href: 'https://github.com/Himath2002/railway-network-simulator', tags: ['Java', 'Simulation', 'Events'], keywords: ['rail', 'transport', 'network', 'event driven', 'systems'],
+  },
+  {
+    title: 'Gridline Four', year: '2024', category: 'Android strategy game', summary: 'A mobile strategy game engineered for Android.', href: 'https://github.com/Himath2002/gridline-four-android', tags: ['Kotlin', 'Android', 'Game'], keywords: ['mobile', 'game development', 'strategy', 'ui'],
+  },
+  {
+    title: 'Pursuit Rewind', year: '2023', category: 'Low-level terminal game', summary: 'Console gameplay and low-level systems programming in C.', href: 'https://github.com/Himath2002/pursuit-rewind-c', tags: ['C', 'Terminal', 'Game'], keywords: ['console', 'systems programming', 'low level', 'game development'],
+  },
+  {
+    title: 'Terminal Pursuit', year: '2023', category: 'Real-time console game', summary: 'Real-time terminal mechanics implemented in C.', href: 'https://github.com/Himath2002/terminal-pursuit-c', tags: ['C', 'Real-time', 'Game'], keywords: ['console', 'systems programming', 'low level', 'game development'],
+  },
+];
+
+const projectSearchSuggestions = ['AI', 'Mobile', 'Distributed systems', 'Databases', 'Algorithms', 'Cloud', 'Quality assurance', 'Game development'];
+
+const relatedSearchAliases: Record<string, string[]> = {
+  ai: ['artificial intelligence', 'document analysis', 'automation'],
+  algorithm: ['algorithms', 'pathfinding', 'graphs', 'sorting', 'optimization'],
+  algorithms: ['algorithm', 'pathfinding', 'graphs', 'sorting', 'optimization'],
+  aws: ['cloud', 'backend', 'api', 'distributed systems', 'service'],
+  cloud: ['backend', 'api', 'distributed systems', 'service'],
+  backend: ['api', 'fastapi', 'service', 'database'],
+  database: ['databases', 'sql', 'mysql', 'room', 'postgresql'],
+  databases: ['database', 'sql', 'mysql', 'room', 'postgresql'],
+  frontend: ['react', 'typescript', 'android', 'ui'],
+  game: ['game development', 'strategy', 'simulation'],
+  games: ['game development', 'strategy', 'simulation'],
+  mobile: ['android', 'kotlin'],
+  testing: ['quality assurance', 'quality', 'verification'],
+  qa: ['quality assurance', 'quality', 'verification'],
+  security: ['secure', 'integrity', 'trust'],
+};
+
+const normalizeSearchText = (value: string) => value
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9+#.]+/g, ' ')
+  .trim();
+
+const matchesSearchTerm = (source: string, term: string) => {
+  if (term.length > 2) return source.includes(term);
+  return ` ${source} `.includes(` ${term} `);
+};
+
 const capabilities = [
   {
     number: '01',
@@ -121,6 +209,10 @@ function ArrowIcon() {
 
 function GitHubIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.82c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" /></svg>;
+}
+
+function SearchIcon() {
+  return <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.2 4.2" /></svg>;
 }
 
 type AnimatedNumberProps = {
@@ -187,9 +279,52 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [projectQuery, setProjectQuery] = useState(() => new URLSearchParams(window.location.search).get('project') ?? '');
   const heroRef = useRef<HTMLElement>(null);
   const portraitFrameRef = useRef<HTMLDivElement>(null);
   const portraitBrushTargetRef = useRef({ x: 50, y: 42 });
+
+  const normalizedProjectQuery = normalizeSearchText(projectQuery);
+  const projectSearchResults = useMemo(() => {
+    if (!normalizedProjectQuery) return [];
+    const queryTokens = normalizedProjectQuery.split(/\s+/).filter(Boolean);
+
+    return projectSearchIndex
+      .map((project) => {
+        const title = normalizeSearchText(project.title);
+        const category = normalizeSearchText(project.category);
+        const tags = normalizeSearchText(project.tags.join(' '));
+        const haystack = normalizeSearchText([project.title, project.category, project.summary, project.tags.join(' '), project.keywords.join(' ')].join(' '));
+        const directMatch = queryTokens.every((token) => matchesSearchTerm(haystack, token));
+        const relatedMatch = queryTokens.every((token) => {
+          const aliases = relatedSearchAliases[token] ?? [];
+          return matchesSearchTerm(haystack, token) || aliases.some((alias) => matchesSearchTerm(haystack, normalizeSearchText(alias)));
+        });
+        if (!relatedMatch) return null;
+
+        const score = queryTokens.reduce((total, token) => total
+          + (matchesSearchTerm(title, token) ? 14 : 0)
+          + (matchesSearchTerm(tags, token) ? 9 : 0)
+          + (matchesSearchTerm(category, token) ? 6 : 0)
+          + (matchesSearchTerm(haystack, token) ? 3 : 1), 0);
+        return { ...project, directMatch, score };
+      })
+      .filter((project): project is SearchProject & { directMatch: boolean; score: number } => Boolean(project))
+      .sort((a, b) => Number(b.directMatch) - Number(a.directMatch) || b.score - a.score || Number(b.year) - Number(a.year));
+  }, [normalizedProjectQuery]);
+
+  const visibleSearchSuggestions = useMemo(() => {
+    if (!normalizedProjectQuery) return projectSearchSuggestions.slice(0, 6);
+    const matches = projectSearchSuggestions.filter((suggestion) => normalizeSearchText(suggestion).includes(normalizedProjectQuery));
+    return matches.length ? matches.slice(0, 6) : projectSearchSuggestions.slice(0, 4);
+  }, [normalizedProjectQuery]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (normalizedProjectQuery) url.searchParams.set('project', projectQuery.trim());
+    else url.searchParams.delete('project');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }, [normalizedProjectQuery, projectQuery]);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -377,7 +512,8 @@ function App() {
           <div className="hero-orb orb-one" aria-hidden="true" />
           <div className="hero-orb orb-two" aria-hidden="true" />
           <div className="hero-copy">
-            <div className="eyebrow hero-eyebrow"><span /> Software Engineer · Colombo, Sri Lanka</div>
+            <div className="eyebrow hero-eyebrow"><span /> Software Engineer · AI-powered products · Colombo, Sri Lanka</div>
+            <p className="hero-introduction">Hi, I&apos;m Himath Ahangama.</p>
             <h1 aria-label="Hard problems. Clear decisions. Software that delivers.">
               <span className="hero-line"><i>Hard problems<span className="accent-dot">.</span></i></span>
               <span className="hero-line"><i>Clear decisions<span className="accent-dot">.</span></i></span>
@@ -385,7 +521,7 @@ function App() {
               <span className="hero-line"><i>delivers<span className="accent-dot">.</span></i></span>
             </h1>
             <p className="hero-lead">
-              I bring product, systems, data, quality, and security together to turn demanding ideas into dependable results - from first architecture to verified delivery.
+              I engineer AI-powered products and dependable software by bringing product, systems, data, quality, and security together - from first architecture to verified delivery.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" data-magnetic href="#work">Explore the work <ArrowIcon /></a>
@@ -447,7 +583,7 @@ function App() {
         <div className="capability-marquee" aria-hidden="true">
           <div>
             {[...Array(2)].map((_, group) => (
-              <span key={group}>WEB ENGINEERING <i /> MOBILE <i /> SYSTEMS <i /> DATA <i /> TESTING &amp; QA <i /> SECURITY <i /> DEBUGGING <i /> GAME DEVELOPMENT <i /></span>
+              <span key={group}>AI ENGINEERING <i /> WEB ENGINEERING <i /> MOBILE <i /> SYSTEMS <i /> DATA <i /> TESTING &amp; QA <i /> SECURITY <i /> DEBUGGING <i /> GAME DEVELOPMENT <i /></span>
             ))}
           </div>
         </div>
@@ -463,7 +599,7 @@ function App() {
             <div className="flagship-topline"><span>Flagship platform</span><span>01 - EduGuard · 2026</span></div>
             <div className="flagship-copy">
               <div className="flagship-title">
-                <span>Human-led academic integrity</span>
+                <span>AI-powered · human-led academic integrity</span>
                 <h3>Edu<span>Guard</span></h3>
               </div>
               <p>
@@ -512,6 +648,82 @@ function App() {
               </article>
             ))}
           </div>
+
+          <section id="project-finder" className="project-finder" data-reveal aria-labelledby="project-finder-title">
+            <div className="project-finder-heading">
+              <div>
+                <span className="eyebrow">Project finder</span>
+                <h3 id="project-finder-title">Find the work behind<br /><em>any capability.</em></h3>
+              </div>
+              <p>Search every published project by technology, platform, engineering concept, problem domain, or project name.</p>
+            </div>
+
+            <form className="project-search" role="search" onSubmit={(event) => event.preventDefault()}>
+              <label htmlFor="project-search-input">Search all software projects</label>
+              <div className="project-search-control">
+                <SearchIcon />
+                <input
+                  id="project-search-input"
+                  type="search"
+                  value={projectQuery}
+                  onChange={(event) => setProjectQuery(event.target.value)}
+                  placeholder="Try AI, Android, Java, databases, cloud, QA..."
+                  autoComplete="off"
+                  spellCheck="false"
+                  list="project-search-suggestions"
+                  aria-controls="project-search-results"
+                  aria-describedby="project-search-guidance project-search-status"
+                />
+                {projectQuery && <button type="button" onClick={() => setProjectQuery('')} aria-label="Clear project search">Clear</button>}
+              </div>
+              <datalist id="project-search-suggestions">
+                {projectSearchSuggestions.map((suggestion) => <option value={suggestion} key={suggestion} />)}
+              </datalist>
+              <p id="project-search-guidance" className="project-search-guidance">Search understands exact technologies and carefully mapped related concepts. Related results are labelled so the portfolio never claims a tool that was not used.</p>
+            </form>
+
+            <div className="project-suggestions" aria-label="Suggested project searches">
+              <span>Suggested</span>
+              {visibleSearchSuggestions.map((suggestion) => (
+                <button
+                  type="button"
+                  key={suggestion}
+                  onClick={() => setProjectQuery(suggestion)}
+                  aria-pressed={normalizeSearchText(suggestion) === normalizedProjectQuery}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
+            <div id="project-search-status" className="project-search-status" role="status" aria-live="polite">
+              {!normalizedProjectQuery && <span>12 projects indexed · start with a suggestion or any keyword</span>}
+              {normalizedProjectQuery && projectSearchResults.length > 0 && (
+                <span>{projectSearchResults.length} {projectSearchResults.length === 1 ? 'project' : 'projects'} found for “{projectQuery.trim()}”</span>
+              )}
+              {normalizedProjectQuery && projectSearchResults.length === 0 && <span>No verified project matches “{projectQuery.trim()}” yet.</span>}
+            </div>
+
+            {normalizedProjectQuery && projectSearchResults.length > 0 && (
+              <ul id="project-search-results" className="project-search-results" aria-label="Project search results">
+                {projectSearchResults.map((project) => (
+                  <li key={project.title}>
+                    <a href={project.href} target="_blank" rel="noreferrer">
+                      <span className="search-result-index">{String(projectSearchIndex.findIndex((item) => item.title === project.title) + 1).padStart(2, '0')}</span>
+                      <span className="search-result-copy">
+                        <small>{project.category} · {project.year}</small>
+                        <strong>{project.title}</strong>
+                        <p>{project.summary}</p>
+                      </span>
+                      <span className="search-result-tags">{project.tags.slice(0, 3).map((tag) => <em key={tag}>{tag}</em>)}</span>
+                      <span className={project.directMatch ? 'direct-match' : 'related-match'}>{project.directMatch ? 'Exact match' : 'Related match'}</span>
+                      <ArrowIcon />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
           <div className="archive" data-reveal>
             <div className="archive-heading"><span>More engineering work</span><p>Focused projects, each preserved as a clear technical case study.</p></div>
