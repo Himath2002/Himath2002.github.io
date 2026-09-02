@@ -10,6 +10,18 @@
   initial-value: 42%;
 }
 
+@property --brush-bloom-x {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --brush-bloom-y {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 :root {
   color-scheme: dark;
   font-family: 'Manrope', system-ui, sans-serif;
@@ -145,13 +157,35 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .portrait-base { position: relative; z-index: 1; width: 100%; aspect-ratio: .8; object-fit: cover; object-position: 50% 44%; filter: saturate(.94) contrast(1.025); }
 .portrait-glow { position: absolute; z-index: 0; top: 6%; left: 8%; width: 84%; aspect-ratio: 1; border-radius: 50%; background: rgba(35,153,255,.18); filter: blur(40px); }
 .portrait-effect-definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
-.portrait-paint { position: absolute; z-index: 2; inset: 0; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity .2s ease; filter: url(#watercolour-distortion); -webkit-mask-image: radial-gradient(ellipse clamp(110px, 10vw, 148px) clamp(62px, 6.5vw, 88px) at var(--reveal-x) var(--reveal-y), #000 0 44%, rgba(0,0,0,.92) 53%, rgba(0,0,0,.38) 65%, transparent 78%), radial-gradient(ellipse 74px 34px at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 34%, rgba(0,0,0,.55) 58%, transparent 77%), radial-gradient(ellipse 64px 29px at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 32%, rgba(0,0,0,.5) 58%, transparent 78%), radial-gradient(circle 24px at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.75), transparent 72%); mask-image: radial-gradient(ellipse clamp(110px, 10vw, 148px) clamp(62px, 6.5vw, 88px) at var(--reveal-x) var(--reveal-y), #000 0 44%, rgba(0,0,0,.92) 53%, rgba(0,0,0,.38) 65%, transparent 78%), radial-gradient(ellipse 74px 34px at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 34%, rgba(0,0,0,.55) 58%, transparent 77%), radial-gradient(ellipse 64px 29px at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 32%, rgba(0,0,0,.5) 58%, transparent 78%), radial-gradient(circle 24px at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.75), transparent 72%); will-change: mask-image, opacity; }
+.portrait-paint {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  animation: brush-bloom 3.2s cubic-bezier(.45, 0, .55, 1) infinite;
+  -webkit-mask-image:
+    radial-gradient(ellipse calc(clamp(110px, 10vw, 148px) + var(--brush-bloom-x)) calc(clamp(62px, 6.5vw, 88px) + var(--brush-bloom-y)) at var(--reveal-x) var(--reveal-y), #000 0 43%, rgba(0,0,0,.94) 51%, rgba(0,0,0,.42) 64%, transparent 79%),
+    radial-gradient(ellipse calc(74px + var(--brush-bloom-y)) calc(34px + var(--brush-bloom-x)) at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 32%, rgba(0,0,0,.58) 57%, transparent 79%),
+    radial-gradient(ellipse calc(64px - var(--brush-bloom-y)) calc(29px + var(--brush-bloom-x)) at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 31%, rgba(0,0,0,.52) 57%, transparent 80%),
+    radial-gradient(circle calc(24px + var(--brush-bloom-y)) at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.78), transparent 73%);
+  mask-image:
+    radial-gradient(ellipse calc(clamp(110px, 10vw, 148px) + var(--brush-bloom-x)) calc(clamp(62px, 6.5vw, 88px) + var(--brush-bloom-y)) at var(--reveal-x) var(--reveal-y), #000 0 43%, rgba(0,0,0,.94) 51%, rgba(0,0,0,.42) 64%, transparent 79%),
+    radial-gradient(ellipse calc(74px + var(--brush-bloom-y)) calc(34px + var(--brush-bloom-x)) at calc(var(--reveal-x) - 88px) calc(var(--reveal-y) + 10px), #000 0 32%, rgba(0,0,0,.58) 57%, transparent 79%),
+    radial-gradient(ellipse calc(64px - var(--brush-bloom-y)) calc(29px + var(--brush-bloom-x)) at calc(var(--reveal-x) + 92px) calc(var(--reveal-y) - 13px), #000 0 31%, rgba(0,0,0,.52) 57%, transparent 80%),
+    radial-gradient(circle calc(24px + var(--brush-bloom-y)) at calc(var(--reveal-x) - 126px) calc(var(--reveal-y) - 19px), rgba(0,0,0,.78), transparent 73%);
+  will-change: mask-image, opacity;
+}
 .portrait-frame:hover .portrait-paint, .portrait-frame:focus-visible .portrait-paint { opacity: 1; }
-.portrait-paint > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 44%; filter: saturate(.76) contrast(1.02) brightness(1.07); }
+.portrait-paint > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 44%; filter: url(#watercolour-distortion) saturate(.76) contrast(1.02) brightness(1.07); }
 .portrait-paint::before { position: absolute; z-index: 1; inset: 0; content: ''; background: radial-gradient(ellipse at 33% 44%, rgba(205,234,238,.28), transparent 31%), radial-gradient(ellipse at 69% 53%, rgba(62,105,137,.24), transparent 37%), linear-gradient(104deg, rgba(193,226,232,.16), rgba(56,103,132,.1) 48%, rgba(231,242,245,.14)); mix-blend-mode: screen; opacity: .7; }
 .portrait-paint::after { position: absolute; z-index: 2; inset: 0; content: ''; background: linear-gradient(96deg, transparent 8%, rgba(222,246,248,.12) 43%, transparent 74%); mix-blend-mode: soft-light; }
-.paint-keywords { position: absolute; z-index: 3; inset: 0; color: rgba(240,250,250,.94); font: 700 clamp(9px, .9vw, 13px) 'DM Mono', monospace; letter-spacing: .12em; text-shadow: 0 1px 13px rgba(8,33,50,.78); text-transform: uppercase; }
-.paint-keywords span { position: absolute; white-space: nowrap; }
+.paint-keywords { position: absolute; z-index: 3; inset: 0; color: #effdff; font: 800 clamp(10px, 1.02vw, 15px) 'Manrope', system-ui, sans-serif; letter-spacing: .065em; text-transform: uppercase; }
+.paint-keywords span { position: absolute; white-space: nowrap; text-shadow: 0 0 2px rgba(255,255,255,.98), 0 0 8px rgba(94,233,255,.96), 0 0 22px rgba(37,156,255,.9), 0 2px 12px rgba(2,16,38,.95); animation: keyword-float-a 4.8s ease-in-out infinite; will-change: transform, filter; }
+.paint-keywords span:nth-child(3n + 2) { animation-name: keyword-float-b; animation-duration: 5.6s; animation-delay: -.9s; }
+.paint-keywords span:nth-child(3n) { animation-name: keyword-float-c; animation-duration: 6.2s; animation-delay: -1.7s; }
 .keyword-assure { top: 19%; left: 6%; }
 .keyword-secure { top: 29%; right: 5%; }
 .keyword-confidence { top: 42%; left: 3%; font-size: 1.12em; }
@@ -162,6 +196,10 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .keyword-resilience { bottom: 10%; left: 9%; }
 .keyword-deliver { right: 13%; bottom: 8%; }
 .keyword-systems { bottom: 31%; left: 5%; }
+@keyframes brush-bloom { 0%, 100% { --brush-bloom-x: -2px; --brush-bloom-y: 4px; } 34% { --brush-bloom-x: 8px; --brush-bloom-y: -3px; } 67% { --brush-bloom-x: 3px; --brush-bloom-y: 7px; } }
+@keyframes keyword-float-a { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-.35deg); filter: brightness(1); } 50% { transform: translate3d(4px, -7px, 0) rotate(.45deg); filter: brightness(1.18); } }
+@keyframes keyword-float-b { 0%, 100% { transform: translate3d(0, 0, 0) rotate(.25deg); filter: brightness(1.05); } 50% { transform: translate3d(-5px, 6px, 0) rotate(-.5deg); filter: brightness(1.22); } }
+@keyframes keyword-float-c { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); filter: brightness(1); } 50% { transform: translate3d(3px, 5px, 0) scale(1.025); filter: brightness(1.16); } }
 @keyframes portrait-touch-paint { 0%, 12% { --reveal-x: 28%; --reveal-y: 27%; } 38% { --reveal-x: 70%; --reveal-y: 39%; } 65% { --reveal-x: 36%; --reveal-y: 63%; } 88%, 100% { --reveal-x: 68%; --reveal-y: 76%; } }
 .portrait-orbit { position: absolute; z-index: 1; border: 1px solid rgba(85,160,255,.19); border-radius: 50%; }
 .orbit-a { inset: 8% -1% 15%; transform: rotate(18deg); }
@@ -240,6 +278,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .project-insight strong { overflow: hidden; color: #cbd9ec; font-size: 9px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
 .project-open { position: absolute; z-index: 2; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 8px; padding: 11px 13px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(3,6,14,.82); font-size: 10px; font-weight: 700; opacity: 0; transform: translateY(8px); transition: opacity .25s ease, transform .25s ease; backdrop-filter: blur(10px); }
 .project-count { position: absolute; top: 18px; left: 18px; padding: 8px 9px; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: rgba(3,6,14,.7); font: 500 9px 'DM Mono', monospace; backdrop-filter: blur(8px); }
+.project-year { position: absolute; z-index: 3; top: 18px; right: 18px; padding: 7px 9px; border: 1px solid rgba(114,213,255,.26); border-radius: 8px; color: #d9f7ff; background: rgba(3,10,23,.78); font: 650 9px 'DM Mono', monospace; letter-spacing: .08em; box-shadow: 0 8px 24px rgba(0,0,0,.22); backdrop-filter: blur(9px); }
 .project-visual:hover img { transform: scale(1.025); filter: saturate(1.12) contrast(1.02); }
 .project-visual:hover::after { border-color: rgba(79,202,255,.38); background: rgba(10,95,180,.04); }
 .project-visual:hover .project-open { opacity: 1; transform: translateY(0); }
@@ -256,9 +295,10 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .archive-heading span { color: var(--ink); font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
 .archive-heading p { max-width: 310px; margin: 15px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
 .archive-list { border-top: 1px solid var(--line); }
-.archive-list a { display: grid; grid-template-columns: 36px minmax(160px, .8fr) minmax(180px, 1fr) 90px 20px; align-items: center; gap: 18px; min-width: 0; padding: 22px 4px; border-bottom: 1px solid var(--line); transition: color .2s ease, padding .25s ease, background .2s ease; }
+.archive-list a { display: grid; grid-template-columns: 36px minmax(160px, .8fr) minmax(180px, 1fr) 52px 90px 20px; align-items: center; gap: 18px; min-width: 0; padding: 22px 4px; border-bottom: 1px solid var(--line); transition: color .2s ease, padding .25s ease, background .2s ease; }
 .archive-list a:hover { padding-right: 12px; padding-left: 12px; color: var(--blue); background: rgba(55,135,218,.05); }
 .archive-list a > span, .archive-list em { color: #637087; font: 500 9px 'DM Mono', monospace; font-style: normal; text-transform: uppercase; }
+.archive-year { justify-self: start; color: #78cce8; font: 650 9px 'DM Mono', monospace; letter-spacing: .06em; }
 .archive-list strong { font-size: 16px; }
 .archive-list p { min-width: 0; margin: 0; overflow: hidden; color: #7f8a9f; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .archive-list svg { justify-self: end; }
@@ -385,7 +425,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .flagship-proof div:nth-child(n+3) { border-top: 1px solid var(--line); }
   .project-grid { grid-template-columns: 1fr; gap: 70px; margin-top: 90px; }
   .archive { grid-template-columns: 1fr; gap: 40px; }
-  .archive-list a { grid-template-columns: 34px minmax(0, 1fr) 70px 18px; }
+  .archive-list a { grid-template-columns: 34px minmax(0, 1fr) 52px 70px 18px; }
   .archive-list p { display: none; }
   .story-grid { grid-template-columns: 1fr; }
   .story-portrait { max-width: 540px; }
@@ -440,9 +480,10 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .project-open { display: none; }
   .project-insight { display: none; }
   .project-count { display: none; }
+  .project-year { top: 10px; right: 10px; padding: 6px 7px; font-size: 8px; }
   .project-copy h3 { font-size: 38px; }
   .archive { margin-top: 100px; }
-  .archive-list a { grid-template-columns: 28px minmax(0, 1fr) 18px; gap: 10px; padding: 19px 2px; }
+  .archive-list a { grid-template-columns: 28px minmax(0, 1fr) 46px 18px; gap: 10px; padding: 19px 2px; }
   .archive-list em { display: none; }
   .capability-grid { grid-template-columns: 1fr; }
   .capability-card { min-height: 460px; }
