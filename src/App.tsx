@@ -201,6 +201,47 @@ const capabilities = [
   },
 ];
 
+const skillGroups = [
+  {
+    number: '01',
+    title: 'AI & intelligence',
+    focus: 'Evidence-aware machine intelligence with people kept in the decision loop.',
+    skills: ['Sentence Transformers', 'Hugging Face', 'PyTorch', 'spaCy', 'FAISS', 'NumPy', 'Semantic similarity', 'Document analysis', 'AI text detection', 'Human-in-the-loop AI'],
+  },
+  {
+    number: '02',
+    title: 'Languages & web core',
+    focus: 'The language foundations behind product, platform, data, and systems work.',
+    skills: ['Python', 'TypeScript', 'JavaScript', 'Java', 'Kotlin', 'C#', 'C', 'SQL', 'HTML', 'CSS'],
+  },
+  {
+    number: '03',
+    title: 'Product interfaces',
+    focus: 'Responsive experiences for web, mobile, and desktop software.',
+    skills: ['React', 'Vite', 'Tailwind CSS', 'Redux Toolkit', 'TanStack Query', 'React Hook Form', 'Framer Motion', 'Android SDK', 'Material Design', 'JavaFX'],
+  },
+  {
+    number: '04',
+    title: 'Backend & data',
+    focus: 'Typed service boundaries, durable persistence, and real-time workflows.',
+    skills: ['FastAPI', 'REST APIs', 'Pydantic', 'SQLAlchemy', 'PostgreSQL', 'MySQL', 'Room & SQLite', 'WebSockets', 'Celery', 'S3-compatible storage'],
+  },
+  {
+    number: '05',
+    title: 'Quality & delivery',
+    focus: 'Repeatable proof from the smallest component to the complete workflow.',
+    skills: ['Pytest', 'Vitest', 'Testing Library', 'Playwright', 'k6', 'GitHub Actions', 'CodeQL', 'ESLint', 'PMD', 'Gradle'],
+  },
+  {
+    number: '06',
+    title: 'Systems & architecture',
+    focus: 'Structures that stay understandable as behaviour and scale become harder.',
+    skills: ['MVVM', 'WCF', 'WPF', 'Concurrency', 'Worker pools', 'Distributed systems', 'Plugin architecture', 'Data structures', 'Graph algorithms', 'Database normalization'],
+  },
+] as const;
+
+const skillCount = skillGroups.reduce((count, group) => count + group.skills.length, 0);
+
 const transcriptUrl = import.meta.env.VITE_TRANSCRIPT_URL?.trim();
 
 function ArrowIcon() {
@@ -335,6 +376,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!loaded || !window.location.hash) return;
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (!target) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(() => target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }), reduceMotion ? 0 : 180);
+    return () => window.clearTimeout(timer);
+  }, [loaded]);
+
+  useEffect(() => {
     const frame = portraitFrameRef.current;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!frame || reduceMotion) return;
@@ -361,23 +411,27 @@ function App() {
       x += velocityX;
       y += velocityY;
 
-      trailOneX += (x - trailOneX) * 0.2;
-      trailOneY += (y - trailOneY) * 0.2;
-      trailTwoX += (trailOneX - trailTwoX) * 0.135;
-      trailTwoY += (trailOneY - trailTwoY) * 0.135;
-      trailThreeX += (trailTwoX - trailThreeX) * 0.09;
-      trailThreeY += (trailTwoY - trailThreeY) * 0.09;
-
       const speed = Math.hypot(velocityX, velocityY);
-      const motionTarget = Math.min(1, speed * 0.34);
-      motion += (motionTarget - motion) * (motionTarget > motion ? 0.28 : 0.11);
+      const motionTarget = Math.min(1, speed * 0.46);
+      motion += (motionTarget - motion) * (motionTarget > motion ? 0.34 : 0.105);
+      const trailOnePull = 0.22 - motion * 0.075;
+      const trailTwoPull = 0.15 - motion * 0.052;
+      const trailThreePull = 0.102 - motion * 0.035;
+      trailOneX += (x - trailOneX) * trailOnePull;
+      trailOneY += (y - trailOneY) * trailOnePull;
+      trailTwoX += (trailOneX - trailTwoX) * trailTwoPull;
+      trailTwoY += (trailOneY - trailTwoY) * trailTwoPull;
+      trailThreeX += (trailTwoX - trailThreeX) * trailThreePull;
+      trailThreeY += (trailTwoY - trailThreeY) * trailThreePull;
+
       const directionX = speed > 0.035 ? velocityX / speed : 0;
       const directionY = speed > 0.035 ? velocityY / speed : 0;
-      const waterX = Math.sin(time * 0.017 + y * 0.08) * motion * 1.65;
-      const waterY = Math.cos(time * 0.014 + x * 0.07) * motion * 1.4;
+      const crossWave = (Math.sin(time * 0.023 + x * 0.055) + Math.sin(time * 0.011 + y * 0.09) * 0.5) * motion * 1.45;
+      const waterX = Math.sin(time * 0.021 + y * 0.08) * motion * 2.15 - directionY * crossWave;
+      const waterY = Math.cos(time * 0.017 + x * 0.07) * motion * 1.82 + directionX * crossWave;
       const revealX = Math.min(98, Math.max(2, x + waterX));
       const revealY = Math.min(98, Math.max(2, y + waterY));
-      const wakeOffset = motion * 5.6;
+      const wakeOffset = motion * (6.4 + Math.min(speed * 1.25, 4.6));
       const wakeAX = Math.min(98, Math.max(2, trailOneX - directionY * wakeOffset));
       const wakeAY = Math.min(98, Math.max(2, trailOneY + directionX * wakeOffset));
       const wakeBX = Math.min(98, Math.max(2, trailTwoX + directionY * wakeOffset * 0.74));
@@ -429,7 +483,7 @@ function App() {
     );
     document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => revealObserver.observe(element));
 
-    const sections = ['home', 'work', 'capabilities', 'story', 'contact']
+    const sections = ['home', 'work', 'capabilities', 'toolkit', 'story', 'contact']
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     const sectionObserver = new IntersectionObserver(
@@ -566,6 +620,7 @@ function App() {
           {[
             ['work', 'Work'],
             ['capabilities', 'Capabilities'],
+            ['toolkit', 'Toolkit'],
             ['story', 'Story'],
             ['contact', 'Contact'],
           ].map(([id, label]) => (
@@ -627,10 +682,10 @@ function App() {
                 <defs>
                   <filter id="watercolour-distortion" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
                     <feTurbulence type="fractalNoise" baseFrequency="0.018 0.048" numOctaves="3" seed="17" result="watercolour-noise">
-                      <animate attributeName="baseFrequency" dur="6.8s" values="0.018 0.048;0.024 0.039;0.016 0.054;0.021 0.044;0.018 0.048" repeatCount="indefinite" />
+                      <animate attributeName="baseFrequency" dur="5.6s" values="0.018 0.048;0.025 0.038;0.015 0.056;0.022 0.043;0.018 0.048" repeatCount="indefinite" />
                     </feTurbulence>
                     <feDisplacementMap in="SourceGraphic" in2="watercolour-noise" scale="10" xChannelSelector="R" yChannelSelector="B">
-                      <animate attributeName="scale" dur="4.8s" values="9;15;11;17;9" repeatCount="indefinite" />
+                      <animate attributeName="scale" dur="4.2s" values="9;17;11;18;9" repeatCount="indefinite" />
                     </feDisplacementMap>
                     <feGaussianBlur stdDeviation="0.12" />
                   </filter>
@@ -655,7 +710,7 @@ function App() {
               </div>
             </div>
             <div className="portrait-interaction-hint" aria-hidden="true"><span>Touch + drag to paint</span><i /><span>Keep scrolling to continue</span></div>
-            <div className="hero-index" aria-hidden="true">01 / 05</div>
+            <div className="hero-index" aria-hidden="true">01 / 06</div>
           </div>
           <a className="scroll-cue" href="#work"><span>Scroll to explore</span><i /></a>
         </section>
@@ -841,9 +896,44 @@ function App() {
 
         </section>
 
+        <section id="toolkit" className="section toolkit-section">
+          <div className="section-heading toolkit-heading" data-reveal>
+            <div><span className="section-number">03</span><span className="eyebrow">Engineering toolkit</span></div>
+            <h2>Range, organized<br /><em>with purpose.</em></h2>
+            <p>A project-backed view of the technologies and practices I use across AI, product engineering, data, quality, and software systems.</p>
+          </div>
+
+          <div className="toolkit-console" data-reveal data-spotlight>
+            <div className="toolkit-console-copy">
+              <span className="toolkit-status"><i /> Evidence-led toolkit</span>
+              <h3>Broad enough to connect the system.<br /><em>Focused enough to ship it well.</em></h3>
+              <p>Every group is grounded in the engineering work presented here. The value is not the length of the list; it is knowing what belongs where, why it matters, and how to verify the result.</p>
+            </div>
+            <div className="toolkit-metrics" aria-label="Toolkit overview">
+              <div><AnimatedNumber value={skillCount} /><span>Technologies &amp; practices</span></div>
+              <div><AnimatedNumber value={skillGroups.length} /><span>Connected disciplines</span></div>
+              <div><AnimatedNumber value={projectSearchIndex.length} /><span>Published projects</span></div>
+            </div>
+            <div className="toolkit-radar" aria-hidden="true"><i /><span /><b /></div>
+          </div>
+
+          <div className="skill-grid">
+            {skillGroups.map((group) => (
+              <article className="skill-group" data-reveal data-spotlight key={group.title}>
+                <div className="skill-group-top"><span>{group.number} / {String(skillGroups.length).padStart(2, '0')}</span><i /></div>
+                <h3>{group.title}</h3>
+                <p>{group.focus}</p>
+                <ul aria-label={`${group.title} skills`}>
+                  {group.skills.map((skill) => <li key={skill}><i />{skill}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section id="story" className="section story-section">
           <div className="story-intro" data-reveal>
-            <div><span className="section-number">03</span><span className="eyebrow">Foundation</span></div>
+            <div><span className="section-number">04</span><span className="eyebrow">Foundation</span></div>
             <h2>High standards became<br /><em>a repeatable habit.</em></h2>
             <p>
               I approach software as a connected discipline: understand the real problem, make the structure legible, test what matters, and leave the work stronger than I found it.
@@ -890,7 +980,7 @@ function App() {
         <section id="contact" className="contact-section">
           <div className="contact-orb" aria-hidden="true" />
           <div className="contact-copy" data-reveal>
-            <span className="eyebrow">04 · Start a conversation</span>
+            <span className="eyebrow">05 · Start a conversation</span>
             <h2>Have a difficult<br />problem worth <em>solving?</em></h2>
             <p>Explore the source, understand how I think, and choose the channel that best fits the conversation.</p>
             <div className="contact-directory" aria-label="Contact information">
