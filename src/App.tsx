@@ -13,6 +13,16 @@ type Project = {
 
 const featuredProjects: Project[] = [
   {
+    title: 'BLEVE Pressure Intelligence',
+    year: '2026',
+    eyebrow: 'Physics-guided machine learning',
+    description: 'A reproducible regression system that combines BLEVE scenario audits, domain-guided features, cross-validated model comparison, nonlinear ensembling, and contract-checked pressure exports.',
+    insight: 'Physics-guided features · calibrated ensemble · honest validation',
+    image: '/assets/projects/bleve-pressure-intelligence.svg',
+    href: 'https://github.com/Himath2002/bleve-pressure-intelligence',
+    tags: ['Python', 'Machine Learning', 'Scientific ML'],
+  },
+  {
     title: 'MealMetric',
     year: '2024',
     eyebrow: 'Android product',
@@ -109,9 +119,11 @@ const projectSearchIndex: SearchProject[] = [
     summary: project.description,
     href: project.href,
     tags: project.tags,
-    keywords: project.title === 'MealMetric'
-      ? ['android', 'mobile', 'nutrition', 'privacy', 'local first', 'database', 'retrofit', 'api', 'material design']
-      : project.title === 'Airspace Ops'
+    keywords: project.title === 'BLEVE Pressure Intelligence'
+      ? ['ai', 'machine learning', 'ml', 'python', 'scikit learn', 'regression', 'data science', 'scientific computing', 'physics guided', 'industrial safety', 'bleve', 'blast pressure', 'ensemble', 'gradient boosting', 'neural network', 'validation', 'quality assurance']
+      : project.title === 'MealMetric'
+        ? ['android', 'mobile', 'nutrition', 'privacy', 'local first', 'database', 'retrofit', 'api', 'material design']
+        : project.title === 'Airspace Ops'
         ? ['java', 'javafx', 'desktop', 'concurrency', 'multithreading', 'blocking queues', 'worker pools', 'simulation', 'observable state']
         : project.title === 'Modular Maze Engine'
           ? ['java', 'desktop', 'game development', 'game engine', 'plugins', 'domain specific language', 'dsl', 'scripting', 'localization', 'extensibility']
@@ -766,7 +778,7 @@ function App() {
 
           <div className="project-grid">
             {featuredProjects.map((project, index) => (
-              <article className="project-card" data-reveal data-spotlight key={project.title}>
+              <article className={index === 0 ? 'project-card project-card-priority' : 'project-card'} data-reveal data-spotlight key={project.title}>
                 <a className="project-visual" data-magnetic href={project.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} repository`}>
                   <img src={project.image} alt={`${project.title} project overview`} loading="lazy" />
                   <span className="project-insight"><small>Engineering depth</small><strong>{project.insight}</strong></span>
@@ -775,7 +787,7 @@ function App() {
                   <span className="project-year">{project.year}</span>
                 </a>
                 <div className="project-copy">
-                  <div className="project-meta"><span>{project.eyebrow}</span><span>{String(index + 2).padStart(2, '0')} / 07</span></div>
+                  <div className="project-meta"><span>{project.eyebrow}</span><span>{String(index + 2).padStart(2, '0')} / 08</span></div>
                   <h3><a href={project.href} target="_blank" rel="noreferrer">{project.title}</a></h3>
                   <p>{project.description}</p>
                   <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
@@ -832,7 +844,7 @@ function App() {
             </div>
 
             <div id="project-search-status" className="project-search-status" role="status" aria-live="polite">
-              {!normalizedProjectQuery && <span>12 projects indexed · start with a suggestion or any keyword</span>}
+              {!normalizedProjectQuery && <span>{projectSearchIndex.length} projects indexed · start with a suggestion or any keyword</span>}
               {normalizedProjectQuery && projectSearchResults.length > 0 && (
                 <span>{projectSearchResults.length} {projectSearchResults.length === 1 ? 'project' : 'projects'} found for “{projectQuery.trim()}”</span>
               )}
@@ -865,7 +877,7 @@ function App() {
             <div className="archive-list">
               {archiveProjects.map(([title, description, year, technology, href], index) => (
                 <a href={href} target="_blank" rel="noreferrer" key={title}>
-                  <span>{String(index + 8).padStart(2, '0')}</span><strong>{title}</strong><p>{description}</p><small className="archive-year">{year}</small><em>{technology}</em><ArrowIcon />
+                  <span>{String(index + 9).padStart(2, '0')}</span><strong>{title}</strong><p>{description}</p><small className="archive-year">{year}</small><em>{technology}</em><ArrowIcon />
                 </a>
               ))}
             </div>
