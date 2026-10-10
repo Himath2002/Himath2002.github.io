@@ -254,7 +254,8 @@ const skillGroups = [
 
 const skillCount = skillGroups.reduce((count, group) => count + group.skills.length, 0);
 
-const transcriptUrl = import.meta.env.VITE_TRANSCRIPT_URL?.trim();
+const academicTranscriptUrl = '/documents/academic-transcript-ahegs.pdf';
+const graduationCertificateUrl = '/documents/bachelor-of-computing-distinction-testamur.pdf';
 
 function ArrowIcon() {
   return <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 16 16 4M7 4h9v9" /></svg>;
@@ -962,11 +963,14 @@ function App() {
                 <div>
                   <h3>Bachelor of Computing</h3>
                   <p>Software Engineering Major · Curtin University · Completed with Distinction</p>
-                  {transcriptUrl && (
-                    <a className="transcript-link" href={transcriptUrl} target="_blank" rel="noreferrer">
-                      Open academic eRecord <ArrowIcon />
+                  <div className="academic-document-links">
+                    <a className="transcript-link" href={academicTranscriptUrl} target="_blank" rel="noreferrer">
+                      View official academic transcript (AHEGS) <ArrowIcon />
                     </a>
-                  )}
+                    <a className="transcript-link" href={graduationCertificateUrl} target="_blank" rel="noreferrer">
+                      View graduation certificate - Distinction <ArrowIcon />
+                    </a>
+                  </div>
                 </div>
                 <strong>Distinction</strong>
               </article>
